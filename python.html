@@ -1,0 +1,810 @@
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ Python: Python logging 模組說明</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content2">⭕ Python: parquet 檔案處理</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content3">⭕ Python: 什麼是 List Comprehension</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content4">⭕ Python: any() 是什麼？</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content5">⭕ Python: .endswith() 的正式語法</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content6">⭕ Python: pandas基本使用</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="content1">
+    <h1>Python: Python logging 模組說明</h1>
+    <p>Python 的 <code>logging</code> 模組是內建的日誌系統，用於將程式的運行資訊記錄下來（寫入檔案、終端機或其他輸出裝置）。</p>
+
+    <h2>為什麼使用 logging？</h2>
+    <p>相比 <code>print()</code>，logging 有以下優點：</p>
+    <ul>
+        <li>可設定 等級分類（debug/info/warning/error...）</li>
+        <li>可同時輸出到 檔案與終端機</li>
+        <li>可自訂輸出格式、時間、來源等</li>
+        <li>更方便 除錯、監控、維運</li>
+    </ul>
+
+    <h2>基本用法</h2>
+    <pre><code>import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
+logging.debug("除錯訊息")
+logging.info("一般訊息")
+logging.warning("警告訊息")
+logging.error("錯誤訊息")
+logging.critical("致命錯誤")
+</code></pre>
+
+    <h2>日誌等級（從低到高）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>等級名稱</th>
+                <th>描述</th>
+                <th>常見用途</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>DEBUG</td>
+                <td>最詳細的日誌，用於除錯</td>
+                <td>除錯變數、邏輯判斷</td>
+            </tr>
+            <tr>
+                <td>INFO</td>
+                <td>一般資訊，如成功啟動、成功操作</td>
+                <td>程式流程紀錄、成功提示</td>
+            </tr>
+            <tr>
+                <td>WARNING</td>
+                <td>警告（非致命錯誤）</td>
+                <td>設定異常、重試</td>
+            </tr>
+            <tr>
+                <td>ERROR</td>
+                <td>錯誤（功能失敗）</td>
+                <td>資料庫連線失敗、API 回傳錯誤</td>
+            </tr>
+            <tr>
+                <td>CRITICAL</td>
+                <td>嚴重錯誤，導致程式可能中斷</td>
+                <td>伺服器崩潰、資源無法取得</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>設定 <code>level=logging.INFO</code>，表示會記錄 INFO 以上等級（INFO、WARNING、ERROR、CRITICAL）。</p>
+
+    <h2>格式說明 (format 參數)</h2>
+    <pre><code>format="%(asctime)s [%(levelname)s] %(message)s"</code></pre>
+    <table>
+        <thead>
+            <tr>
+                <th>格式碼</th>
+                <th>說明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>%(asctime)s</td>
+                <td>日誌的時間戳</td>
+            </tr>
+            <tr>
+                <td>%(levelname)s</td>
+                <td>日誌等級（INFO、ERROR 等）</td>
+            </tr>
+            <tr>
+                <td>%(message)s</td>
+                <td>訊息主體</td>
+            </tr>
+            <tr>
+                <td>%(filename)s</td>
+                <td>檔案名稱</td>
+            </tr>
+            <tr>
+                <td>%(lineno)d</td>
+                <td>行號</td>
+            </tr>
+            <tr>
+                <td>%(name)s</td>
+                <td>日誌記錄器名稱</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>寫入檔案範例</h2>
+    <pre><code>logging.basicConfig(
+    filename='app.log',
+    level=logging.WARNING,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
+
+logging.warning("這是一個警告")
+logging.error("這是一個錯誤")
+</code></pre>
+    <p>會寫入到 <code>app.log</code> 檔案中。</p>
+
+    <h2>同時輸出到「終端機」與「檔案」</h2>
+    <pre><code>import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+# 檔案處理器
+file_handler = logging.FileHandler("logfile.log", encoding="utf-8")
+file_handler.setLevel(logging.INFO)
+
+# 終端機處理器
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+# 格式
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# 加入處理器
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+logger.info("這是一則 info 訊息")
+logger.debug("這是一則 debug 訊息")
+</code></pre>
+
+    <h2>補充小技巧</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>功能</th>
+                <th>用法範例</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>限制檔案大小自動輪替</td>
+                <td>from logging.handlers import RotatingFileHandler</td>
+            </tr>
+            <tr>
+                <td>自訂 logger 名稱</td>
+                <td>logger = logging.getLogger("my_app")</td>
+            </tr>
+            <tr>
+                <td>記錄錯誤堆疊</td>
+                <td>logger.exception("錯誤發生")（在 except 中用）</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>測試執行</h2>
+    <pre><code>logging.basicConfig(level=logging.INFO)
+logging.info("開始匯入資料...")
+</code></pre>
+
+    <h2>總結</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>功能</th>
+                <th>logging 優點</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>控制等級</td>
+                <td>只記錄需要的訊息</td>
+            </tr>
+            <tr>
+                <td>自訂輸出</td>
+                <td>可調整格式、位置、來源檔案</td>
+            </tr>
+            <tr>
+                <td>擴充性高</td>
+                <td>可搭配檔案輪替、遠端 log server 等功能</td>
+            </tr>
+            <tr>
+                <td>程式整潔</td>
+                <td>比 print() 更好管理、可部署</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h1></h1>
+<div id="content2">
+    <h1>Python: parquet 檔案處理</h1>
+    <p>parquet 是一種列式儲存格式，適合用於大資料分析。Python 有多個庫可以處理 parquet 檔案，以下是幾種常見方法。</p>
+    <h2>最佳推薦：pandas + pyarrow</h2>
+    <ul>
+        <li><strong>為什麼好用？</strong>
+            <ul>
+                <li>安裝簡單、語法直覺</li>
+                <li>適用中小型資料（幾十萬列以下都沒問題）</li>
+                <li>有完整的錯誤處理與類型支援</li>
+                <li>廣泛被社群使用與支持</li>
+            </ul>
+        </li>
+        <li><strong>使用場景：</strong>
+            <ul>
+                <li>你用 Python 常處理資料</li>
+                <li>資料量不是超級大</li>
+                <li>想快速轉檔、做資料清洗</li>
+            </ul>
+        </li>
+    </ul>
+
+    <pre><code>pip install pandas pyarrow</code></pre>
+    <pre><code>import pandas as pd
+df = pd.read_csv("your_file.csv")
+df.to_parquet("your_file.parquet", engine="pyarrow", index=False)</code></pre>
+
+    <h2>最快速簡單：csv2parquet CLI 工具</h2>
+    <ul>
+        <li><strong>為什麼好用？</strong>
+            <ul>
+                <li>一行指令就能轉檔</li>
+                <li>不用寫程式碼</li>
+                <li>適合自動化、批次轉換</li>
+            </ul>
+        </li>
+        <li><strong>限制：</strong>
+            <ul>
+                <li>不能處理複雜的清理邏輯</li>
+                <li>不如 pandas 靈活</li>
+            </ul>
+        </li>
+    </ul>
+
+    <pre><code>pip install csv2parquet
+csv2parquet input.csv output.parquet</code></pre>
+
+    <h2>處理大資料：Apache Spark</h2>
+    <ul>
+        <li><strong>為什麼好用？</strong>
+            <ul>
+                <li>可處理數十 GB 或 TB 級資料</li>
+                <li>支援分散式計算</li>
+            </ul>
+        </li>
+        <li><strong>限制：</strong>
+            <ul>
+                <li>安裝與設定比較麻煩</li>
+                <li>過度殺雞用牛刀，除非你處理大數據</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>快速總結：</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>方法</th>
+                <th>容易上手</th>
+                <th>支援大資料</th>
+                <th>可編程控制</th>
+                <th>推薦情境</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>pandas+pyarrow</td>
+                <td>✅✅✅</td>
+                <td>❌（中等）</td>
+                <td>✅✅✅</td>
+                <td>日常資料處理與轉檔</td>
+            </tr>
+            <tr>
+                <td>csv2parquet</td>
+                <td>✅✅✅✅</td>
+                <td>❌</td>
+                <td>❌</td>
+                <td>CLI 快速轉檔或腳本自動化</td>
+            </tr>
+            <tr>
+                <td>Spark</td>
+                <td>❌</td>
+                <td>✅✅✅✅</td>
+                <td>✅✅✅</td>
+                <td>巨量資料或雲端應用</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div id="content3">
+    <h1>Python: 什麼是 List Comprehension</h1>
+    <section>
+        <h2>範例 3：處理檔名清單</h2>
+        <pre><code>
+file_list = ['a.csv', 'b.txt', 'c.csv']
+csv_files = [f for f in file_list if f.endswith('.csv')]
+    </code></pre>
+        <p>執行結果：</p>
+        <pre><code>['a.csv', 'c.csv']</code></pre>
+    </section>
+
+    <section>
+        <h2>與傳統 for 寫法比較</h2>
+        <h3>傳統寫法：</h3>
+        <pre><code>
+results = []
+for x in range(10):
+    if x % 2 == 0:
+        results.append(x**2)
+    </code></pre>
+
+        <h3>List Comprehension 寫法：</h3>
+        <pre><code>results = [x**2 for x in range(10) if x % 2 == 0]</code></pre>
+        <p>完全等價！但 List Comprehension 更短、語意更清楚。</p>
+    </section>
+
+    <section>
+        <h2>多層迴圈（進階）</h2>
+        <pre><code>pairs = [(x, y) for x in range(3) for y in range(2)]</code></pre>
+        <p>結果: [(0,0), (0,1), (1,0), (1,1), (2,0), (2,1)]</p>
+    </section>
+
+    <section>
+        <h2>加強理解：執行順序拆解</h2>
+        <pre><code>result = [f(x) for x in data if condition(x)]</code></pre>
+        <p>執行順序：</p>
+        <ol>
+            <li>走訪 data，把每個 x 拿出來。</li>
+            <li>如果 condition(x) 是 True，就繼續。</li>
+            <li>把 f(x) 的結果加進列表。</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>補充：Set 與 Dict Comprehension</h2>
+        <h3>Set Comprehension：</h3>
+        <pre><code>squares_set = {x**2 for x in range(5)}</code></pre>
+
+        <h3>Dict Comprehension：</h3>
+        <pre><code>squares_dict = {x: x**2 for x in range(5)}</code></pre>
+    </section>
+
+    <section>
+        <h2>總結表格：List Comprehension 特點</h2>
+        <table border="1">
+            <tr>
+                <th>特點</th>
+                <th>說明</th>
+            </tr>
+            <tr>
+                <td>簡潔</td>
+                <td>一行搞定建立新列表的邏輯</td>
+            </tr>
+            <tr>
+                <td>高效</td>
+                <td>比 for-loop 快，記憶體使用少</td>
+            </tr>
+            <tr>
+                <td>易讀</td>
+                <td>適合表達單一邏輯</td>
+            </tr>
+            <tr>
+                <td>可配合 if</td>
+                <td>支援條件過濾元素</td>
+            </tr>
+            <tr>
+                <td>可套多層</td>
+                <td>支援巢狀迴圈</td>
+            </tr>
+        </table>
+    </section>
+</div>
+<div id="content4">
+    <h1>any() 是什麼？</h1>
+    <section>
+        <p><code>any()</code> 是 Python 的內建函數，用來判斷一個可迭代物件（如 list、tuple、set、generator）中是否「至少有一個元素為 True」。</p>
+    </section>
+
+    <section>
+        <h2>語法</h2>
+        <pre><code>any(iterable)</code></pre>
+        <p><strong>參數說明：</strong><br>
+            iterable：任何可被迭代的物件，例如 list、tuple、set、dict、string、generator。</p>
+
+        <p><strong>回傳值：</strong></p>
+        <ul>
+            <li><code>True</code>：如果 iterable 中「至少一個元素為真」（truthy）。</li>
+            <li><code>False</code>：如果 iterable 是空的，或所有元素皆為假（falsy）。</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>判斷標準（Truthy vs Falsy）</h2>
+        <p>在 Python 中，以下會被視為「Falsy」（等同 False）：</p>
+        <ul>
+            <li>False</li>
+            <li>None</li>
+            <li>0（任何數值型 0）</li>
+            <li>''（空字串）</li>
+            <li>[]（空列表）、()（空 tuple）、{}（空 dict）</li>
+        </ul>
+        <p>所有其他東西都視為「Truthy」。</p>
+    </section>
+
+    <section>
+        <h2>範例說明</h2>
+        <h3>範例 1：布林值列表</h3>
+        <pre><code>any([False, False, True])  # → True</code></pre>
+
+        <h3>範例 2：全為 False</h3>
+        <pre><code>any([False, 0, None, ''])  # → False</code></pre>
+
+        <h3>範例 3：數字列表</h3>
+        <pre><code>any([0, 0, 5])  # → True</code></pre>
+
+        <h3>範例 4：文字列表</h3>
+        <pre><code>any(['', '', 'Hello'])  # → True</code></pre>
+    </section>
+
+    <section>
+        <h2>與 all() 的比較</h2>
+        <table border="1">
+            <tr>
+                <th>函數</th>
+                <th>條件</th>
+                <th>回傳 True 的情況</th>
+            </tr>
+            <tr>
+                <td>any()</td>
+                <td>至少一個元素為真</td>
+                <td>有任一為 True 時</td>
+            </tr>
+            <tr>
+                <td>all()</td>
+                <td>所有元素都要為真</td>
+                <td>所有皆為 True 時</td>
+            </tr>
+        </table>
+
+        <p><strong>範例：</strong></p>
+        <pre><code>
+any([0, 1, 2])  # True
+all([0, 1, 2])  # False（因為 0 是 False）
+    </code></pre>
+    </section>
+
+    <section>
+        <h2>常見錯誤</h2>
+        <pre><code>
+any(5)  
+# TypeError: 'int' object is not iterable
+    </code></pre>
+        <p><strong>解法：</strong> 確保傳入的是 iterable（可迭代物件），例如 list：</p>
+        <pre><code>any([5])  # True</code></pre>
+    </section>
+
+    <section>
+        <h2>實用場景</h2>
+        <ul>
+            <li>
+                <strong>判斷資料夾是否有某種檔案（如 .csv）：</strong>
+                <pre><code>
+files = ['a.txt', 'b.csv', 'c.doc']
+has_csv = any(f.endswith('.csv') for f in files)
+            </code></pre>
+            </li>
+            <li>
+                <strong>判斷使用者輸入中是否有不合法內容：</strong>
+                <pre><code>
+inputs = ['123', '', 'hello']
+has_invalid = any(i == '' for i in inputs)  # 有空值 → True
+            </code></pre>
+            </li>
+            <li>
+                <strong>搭配 generator expression 使用，效能更佳（不建立完整列表）：</strong>
+                <pre><code>any(x > 100 for x in large_list)</code></pre>
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>總結表格：any() 函數</h2>
+        <table border="1">
+            <tr>
+                <th>屬性</th>
+                <th>說明</th>
+            </tr>
+            <tr>
+                <td>用途</td>
+                <td>判斷 iterable 是否有「至少一個 True」的元素</td>
+            </tr>
+            <tr>
+                <td>回傳值</td>
+                <td>True / False</td>
+            </tr>
+            <tr>
+                <td>參數類型</td>
+                <td>可迭代物件（list, tuple, set, generator 等）</td>
+            </tr>
+            <tr>
+                <td>常見搭配</td>
+                <td>generator expression、條件判斷</td>
+            </tr>
+            <tr>
+                <td>與 all() 比</td>
+                <td>any() 是「有一個就夠」，all() 是「全部都要」</td>
+            </tr>
+        </table>
+    </section>
+</div>
+<div id="content5">
+    <h1>.endswith() 的正式語法</h1>
+    <section>
+        <pre><code>str.endswith(suffix[, start[, end]])</code></pre>
+        <table border="1">
+            <tr>
+                <th>參數</th>
+                <th>意義</th>
+            </tr>
+            <tr>
+                <td>suffix</td>
+                <td>指定要檢查的結尾字串（可以是一個字串或一個 tuple）</td>
+            </tr>
+            <tr>
+                <td>start</td>
+                <td>（可選）檢查的起始位置（index）</td>
+            </tr>
+            <tr>
+                <td>end</td>
+                <td>（可選）檢查的結束位置（index，不包含）</td>
+            </tr>
+        </table>
+        <p>在大多數情況下，只需要使用最簡單的寫法：</p>
+        <pre><code>file.endswith('.csv')</code></pre>
+    </section>
+
+    <section>
+        <h2>回傳值</h2>
+        <table border="1">
+            <tr>
+                <th>結果</th>
+                <th>說明</th>
+            </tr>
+            <tr>
+                <td>True</td>
+                <td>若字串的最後部分為 .csv</td>
+            </tr>
+            <tr>
+                <td>False</td>
+                <td>若不是以 .csv 結尾</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>工作原理（底層邏輯）</h2>
+        <p>例如這行：</p>
+        <pre><code>'report.csv'.endswith('.csv')</code></pre>
+        <p>會做這件事：</p>
+        <ul>
+            <li>從尾部向前比對 .csv 的每一個字元。</li>
+            <li>如果尾部完全相符，則回傳 True。</li>
+            <li>若任一字元不同，則回傳 False。</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>注意：區分大小寫</h2>
+        <pre><code>'report.CSV'.endswith('.csv')  # False</code></pre>
+        <p>解法：</p>
+        <ul>
+            <li>解法 1：統一轉小寫</li>
+            <pre><code>file.lower().endswith('.csv')</code></pre>
+            <li>解法 2：使用 tuple 支援多副檔名</li>
+            <pre><code>file.endswith(('.csv', '.CSV'))</code></pre>
+        </ul>
+    </section>
+
+    <section>
+        <h2>多副檔名支援：tuple 寫法</h2>
+        <pre><code>file.endswith(('.csv', '.tsv', '.xls'))</code></pre>
+        <p>等同於：</p>
+        <pre><code>
+file.endswith('.csv') or 
+file.endswith('.tsv') or 
+file.endswith('.xls')
+    </code></pre>
+    </section>
+
+    <section>
+        <h2>延伸：實際應用情境</h2>
+        <ul>
+            <li>
+                <strong>過濾檔案列表：</strong>
+                <pre><code>csv_files = [f for f in os.listdir(folder) if f.endswith('.csv')]</code></pre>
+            </li>
+            <li>
+                <strong>搭配 any() 判斷是否包含 CSV 檔：</strong>
+                <pre><code>any(file.endswith('.csv') for file in file_list)</code></pre>
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>常見錯誤</h2>
+        <pre><code>
+file = 12345
+file.endswith('.csv')  # ❌ AttributeError
+    </code></pre>
+        <p>正確寫法：</p>
+        <pre><code>str(file).endswith('.csv')</code></pre>
+    </section>
+
+    <section>
+        <h2>小結：file.endswith('.csv') 重點總覽</h2>
+        <table border="1">
+            <tr>
+                <th>特性</th>
+                <th>說明</th>
+            </tr>
+            <tr>
+                <td>功能</td>
+                <td>判斷字串是否以指定字尾（suffix）結尾</td>
+            </tr>
+            <tr>
+                <td>回傳型別</td>
+                <td>布林值：True 或 False</td>
+            </tr>
+            <tr>
+                <td>區分大小寫</td>
+                <td>是（要注意 .CSV ≠ .csv）</td>
+            </tr>
+            <tr>
+                <td>可支援多副檔名</td>
+                <td>使用 tuple：file.endswith(('.csv', '.tsv'))</td>
+            </tr>
+            <tr>
+                <td>可加範圍檢查</td>
+                <td>使用 start 和 end 參數（進階用）</td>
+            </tr>
+        </table>
+    </section>
+</div>
+<div id="content6">
+    <h1>Python：pandas基本使用</h1>
+    <section>
+        <h2>什麼是 DataFrame？</h2>
+        <p>DataFrame 是 pandas 提供的一種表格型資料結構，很像 Excel 表格或資料庫中的資料表。你可以想成是「由多個 Series（欄）組成的表格」，具備 列（row）與欄（column）索引。</p>
+
+        <h3>如何建立 DataFrame</h3>
+        <pre><code>import pandas as pd
+
+# 從字典建立
+data = {
+    '姓名': ['小明', '小華', '小美'],
+    '年齡': [20, 25, 22],
+    '城市': ['台北', '台中', '高雄']
+}
+
+df = pd.DataFrame(data)
+print(df)
+</code></pre>
+
+        <p>輸出：</p>
+        <pre><code>   姓名  年齡  城市
+0  小明  20  台北
+1  小華  25  台中
+2  小美  22  高雄
+</code></pre>
+
+        <h3>常用操作說明</h3>
+        <ol>
+            <li><strong>查看基本資訊</strong>
+                <pre><code>df.head()         # 顯示前5列
+df.tail(2)        # 顯示最後2列
+df.shape          # 資料維度 (rows, columns)
+df.columns        # 欄位名稱
+df.info()         # 整體結構與欄位型別
+df.describe()     # 數值型欄位統計摘要
+</code></pre>
+            </li>
+
+            <li><strong>取出欄位或列資料</strong>
+                <pre><code>df['年齡']            # 取出「年齡」這欄 (Series)
+df[['姓名', '城市']]   # 同時取出多欄 (DataFrame)
+df.loc[1]            # 依 label 取出第 1 列（index=1）
+df.iloc[0]           # 依位置取出第 0 列
+</code></pre>
+            </li>
+
+            <li><strong>篩選資料（條件過濾）</strong>
+                <pre><code>df[df['年齡'] > 21]           # 篩選年齡大於 21 的人
+df[df['城市'] == '台北']      # 城市為台北的資料
+</code></pre>
+            </li>
+
+            <li><strong>新增或修改欄位</strong>
+                <pre><code>df['成年'] = df['年齡'] >= 20    # 新增布林欄位
+df['年齡'] = df['年齡'] + 1      # 所有人年齡 +1
+</code></pre>
+            </li>
+
+            <li><strong>刪除欄位或列</strong>
+                <pre><code>df.drop('城市', axis=1, inplace=True)  # 刪除欄位（axis=1）
+df.drop(0, axis=0)                     # 刪除列（axis=0，不加 inplace 不會影響原資料）
+</code></pre>
+            </li>
+
+            <li><strong>讀寫檔案</strong>
+                <pre><code># 讀取 CSV
+df = pd.read_csv('data.csv')
+
+# 寫出 CSV
+df.to_csv('output.csv', index=False)
+</code></pre>
+            </li>
+
+            <li><strong>分組與聚合</strong>
+                <pre><code>df.groupby('城市')['年齡'].mean()   # 每個城市的平均年齡
+</code></pre>
+            </li>
+        </ol>
+
+        <h3>DataFrame 與其他格式轉換</h3>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>資料來源</th>
+                    <th>方法</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>dict → DataFrame</td>
+                    <td>pd.DataFrame(字典)</td>
+                </tr>
+                <tr>
+                    <td>list of dicts → DataFrame</td>
+                    <td>pd.DataFrame([{}, {}, ...])</td>
+                </tr>
+                <tr>
+                    <td>DataFrame → dict</td>
+                    <td>df.to_dict()</td>
+                </tr>
+                <tr>
+                    <td>CSV → DataFrame</td>
+                    <td>pd.read_csv()</td>
+                </tr>
+                <tr>
+                    <td>DataFrame → CSV</td>
+                    <td>df.to_csv()</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>小技巧與常見用途</h3>
+        <ul>
+            <li>快速看資料內容 → df.head()</li>
+            <li>快速查看缺失值 → df.isnull().sum()</li>
+            <li>替換缺失值 → df.fillna(0)</li>
+            <li>刪除缺失值 → df.dropna()</li>
+            <li>排序 → df.sort_values(by='年齡')</li>
+        </ul>
+    </section>
+
+</div>

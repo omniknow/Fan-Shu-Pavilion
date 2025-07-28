@@ -1,0 +1,266 @@
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Merriweather', 'Noto Serif TC', serif;
+      background-color: #fdfaf5;
+      color: #5a4e3c;
+      line-height: 1.8;
+    }
+
+    header {
+      background-color: #a2c579;
+      color: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(120, 120, 120, 0.2);
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 15px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    nav ul li a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb {
+      background-color: #f0ebdf;
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #856c4b;
+    }
+
+    .container {
+      display: flex;
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    main {
+      flex: 3;
+      margin-right: 20px;
+      background-color: #fffef9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 6px rgba(150, 150, 150, 0.15);
+    }
+
+    article h2 {
+      margin-bottom: 10px;
+      color: #a95f2b;
+    }
+
+    aside {
+      flex: 1;
+    }
+
+    aside section {
+      background-color: #fffaf0;
+      border-left: 5px solid #c5aa6a;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      padding: 15px;
+      box-shadow: 0 0 5px rgba(200, 180, 140, 0.1);
+    }
+
+    aside h3 {
+      margin-bottom: 10px;
+      color: #8c6e4c;
+    }
+
+    a {
+      color: #a95f2b;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      background-color: #a2c579;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: #fff;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      main {
+        margin-right: 0;
+      }
+    }
+
+    #summary {
+        /* background-color: #f0f0f0; */
+        background-color: #f4f4f4;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 0 6px rgba(150, 150, 150, 0.15);
+        margin-bottom: 20px;
+        /* border-bottom: 3px solid #067004; */
+    }
+
+    /* 固定按鈕在右下角 */
+    #backToTop {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        padding: 10px 20px;
+        background-color: #388e3c;
+        
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        display: none; /* 預設隱藏，滑動才顯示 */
+        z-index: 1000;
+    }
+
+    html {
+        scroll-behavior: smooth; /* 平滑滾動 */
+    }    
+    pre {
+        white-space: pre-wrap;   /* 保留格式，但允許自動換行 */
+        word-wrap: break-word;   /* 長單字也換行 */
+    }
+    code {
+      font-size: 14px;
+    }    
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        line-height: 1.6;
+        margin: 20px;
+        background: #fefefe;
+        color: #333;
+    }
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        /* border-bottom: 2px solid #4caf50; */
+        padding-bottom: 0.3rem;
+        color: #750707;
+    }
+    h1::before {
+        content: "⭕ ";
+        color: #4caf50;
+        font-size: 1.5rem;
+    }
+    h2 {
+        color: #388e3c;
+        margin-top: 1.4rem;
+        margin-bottom: 0.6rem;
+    }
+    h2::before {
+        content: "✅";
+        color: #4caf50;
+        font-size: 1.2rem;
+    }
+    strong::before {
+        content: "💪 ";
+        color: #4caf50;
+    }
+
+    #start1::after {
+        content: " ⭐";
+        color: #4caf50;
+    }
+    #start2::after {
+        content: " ⭐⭐";
+        color: #4caf50;
+    }  
+    #start3::after {
+        content: " ⭐⭐⭐";
+        color: #4caf50;
+    }      
+    p {
+        margin-bottom: 1rem;
+    }
+    ul {
+        list-style: none;
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+    }
+    ol > li::before {
+        content: "🥝 ";
+        color: green;
+    }
+  pre {
+    background: #f4f4f4;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: Consolas, monospace;
+    font-size: 0.95rem;
+    margin: 1rem 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 1rem;
+  }
+  th, td {
+    border: 1px solid #bbb;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background-color: #c8e6c9;
+  }
+  /* .emoji {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 0.3rem;
+  } */
+  img {
+      width: 80%;            /* 寬度為螢幕寬度的80% */
+      max-width: 200px;      /* 最大寬度不超過200px */      
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: block;
+      margin: 20px auto;
+      transition: transform 0.3s ease;
+  }
+
+  img:hover {
+      transform: scale(1.05);
+      cursor: pointer;
+  }

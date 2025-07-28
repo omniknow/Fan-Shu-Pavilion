@@ -1,0 +1,1439 @@
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ spyder: google登陸</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content2">⭕ spyder: 等待動態渲染</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content3">⭕ spyder: 查看動態渲染效果</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content4">⭕ spyder: XPATH與CSS定位差異</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content5">⭕ spyder: selenium基本功能</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content6">⭕ spyder: WebDriverWait使用</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content7">⭕ spyder: excepted conditions(EC)介紹</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content8">⭕ spyder: selenium.webdriver.common.by 模組介紹</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content9">⭕ spyder: Selenium 勾選 checkbox(核取方塊)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content10">⭕ spyder: Selenium 勾選 checkbox(核取方塊)範例程式</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content11">⭕ spyder: Selenium option(下拉式選單)範例程式</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content12">⭕ spyder: Selenium option(下拉式選單)改進建議</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content13">⭕ spyder: Selenium option(下拉式選單)範例程式(改進)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content14">⭕ spyder: The Internet HerokuApp 練習網站簡介</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="content1">
+    <h1>google登陸</h1>
+    <section>
+      <h2>1. 匯入模組</h2>
+      <pre><code>import undetected_chromedriver as uc
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time</code></pre>
+      <p><strong>說明：</strong></p>
+      <ul>
+        <li><code>undetected_chromedriver（uc）</code>：避免網站偵測自動化工具。</li>
+        <li><code>By</code>：指定元素定位方式（如 ID、Class、XPath）。</li>
+        <li><code>WebDriverWait</code>：執行顯性等待，直到特定元素出現。</li>
+        <li><code>EC</code>：Expected Conditions，用於判斷元素是否符合條件。</li>
+        <li><code>time</code>：標準庫，用於暫停程式，例如 sleep。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. 啟動無偵測的 Chrome 瀏覽器</h2>
+      <pre><code>options = uc.ChromeOptions()
+driver = uc.Chrome(options=options)</code></pre>
+      <p><strong>說明：</strong></p>
+      <ul>
+        <li><code>ChromeOptions()</code>：設定瀏覽器參數。</li>
+        <li><code>uc.Chrome(...)</code>：啟動模擬真實使用者的 Chrome。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. 開啟 Google 帳戶登入頁</h2>
+      <pre><code>driver.get("https://accounts.google.com/")</code></pre>
+      <p>導航至 Google 登入頁，預設進入輸入 Email 的頁面。</p>
+    </section>
+
+    <section>
+      <h2>4. 等待 Email 輸入欄位載入且可見</h2>
+      <pre><code>email_input = WebDriverWait(driver, 10).until(
+    EC.visibility_of_element_located((By.ID, "identifierId"))
+)</code></pre>
+      <p><strong>說明：</strong></p>
+      <ul>
+        <li>最多等待 10 秒，直到 Email 欄位顯示。</li>
+        <li>使用 <code>visibility_of_element_located</code> 確保元素在畫面上、可見、非隱藏。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. 輸入 Email 並點擊「下一步」</h2>
+      <pre><code>email_input.send_keys("jeremyfan.genshin@gmail.com")
+driver.find_element(By.ID, "identifierNext").click()</code></pre>
+      <p><strong>說明：</strong></p>
+      <ul>
+        <li><code>send_keys()</code>：模擬輸入 Email。</li>
+        <li><code>find_element(...).click()</code>：點擊「下一步」按鈕。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. 等待觀察或手動操作</h2>
+      <pre><code>time.sleep(50)</code></pre>
+      <p><strong>說明：</strong> 暫停 50 秒，供使用者手動輸入密碼、驗證等操作。</p>
+    </section>
+
+    <section>
+      <h2>7. 關閉瀏覽器</h2>
+      <pre><code>driver.quit()</code></pre>
+      <p><strong>說明：</strong> 正常關閉瀏覽器並釋放資源，避免 OSError。</p>
+    </section>
+
+    <section>
+      <h2>總結用途</h2>
+      <ul>
+        <li>使用非偵測方式開啟 Chrome</li>
+        <li>自動開啟 Google 登入頁</li>
+        <li>輸入 Email 並點選「下一步」</li>
+        <li>可進一步自動輸入密碼、登入或操作帳戶</li>
+      </ul>
+    </section>
+</div>
+
+<div id="content2">
+    <h1>等待動態渲染</h1>
+    <section>
+      <h2>找不到 identifierNext？其實是因為 Google 使用了動態渲染</h2>
+      <p>當你在輸入 Email 時，只看到以下結構：</p>
+      <pre><code>&lt;button ...&gt;
+  &lt;span ...&gt;下一步&lt;/span&gt;
+&lt;/button&gt;</code></pre>
+      <p>你可能會誤以為按鈕沒有 <code>id="identifierNext"</code>，但實際上：</p>
+      <ul>
+        <li><strong>這個 ID 是由 JavaScript 動態加上的</strong>，初始 HTML 中不會出現。</li>
+        <li>只有在整個頁面渲染完畢（即 JS 執行後）才會出現。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>如何確認這一點？</h2>
+      <h3>方式一：開發者工具中搜尋 identifierNext</h3>
+      <ol>
+        <li>按 <kbd>F12</kbd> 開啟開發者工具。</li>
+        <li>等頁面載入後，按 <kbd>Ctrl + F</kbd> 搜尋 <code>identifierNext</code>。</li>
+        <li>你會看到如下結構：</li>
+      </ol>
+      <pre><code>&lt;button id="identifierNext" class="VfPpkd-LgbsSe ..."&gt;
+  ...
+  &lt;span&gt;下一步&lt;/span&gt;
+&lt;/button&gt;</code></pre>
+      <p>但如果你用 <code>view-source:</code> 或爬 HTML 原始碼，則無法看到這個 ID。</p>
+    </section>
+
+    <section>
+      <h2>為什麼 Selenium 可以抓到它？</h2>
+      <ul>
+        <li>Selenium 是模擬 <strong>真實瀏覽器</strong>，載入後的完整網頁內容（包括 JS 結果）。</li>
+        <li>所以這段程式碼會正常運作：</li>
+      </ul>
+      <pre><code>next_button = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.ID, "identifierNext"))
+)
+next_button.click()</code></pre>
+      <p><strong>但這段就可能會抓不到：</strong></p>
+      <pre><code>driver.page_source  # 這是初始 HTML，可能沒有 identifierNext</code></pre>
+    </section>
+
+    <section>
+      <h2>解法建議：用備用定位方式</h2>
+      <p>若你抓不到 <code>identifierNext</code>，可以改用按鈕內文字來定位：</p>
+      <pre><code>next_button = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='下一步']]"))
+)
+next_button.click()</code></pre>
+      <p>這是最保險的做法，不依賴 ID 屬性。</p>
+    </section>
+
+    <section>
+      <h2>小結</h2>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th>問題</th>
+            <th>原因</th>
+            <th>解法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>找不到 identifierNext</td>
+            <td>動態渲染產生的，不在原始 HTML</td>
+            <td>用 Selenium 或 DevTools 看渲染後</td>
+          </tr>
+          <tr>
+            <td>Selenium 找不到它</td>
+            <td>頁面還沒載完或按鈕被遮住</td>
+            <td>用 WebDriverWait + clickable</td>
+          </tr>
+          <tr>
+            <td>手動檢查時沒看到 id</td>
+            <td>是 JavaScript 動態加的</td>
+            <td>用 DevTools 看動態 DOM</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</div>
+
+<div id="content3">
+    <h1>查看動態渲染的效果</h1>
+    <section>
+      <h2>方法一：使用 Chrome 開發者工具（F12）檢查元素</h2>
+      <p>這是最直覺、也最推薦的方式：</p>
+      <h3>步驟：</h3>
+      <ol>
+        <li>開啟瀏覽器並進入要檢查的頁面（如 Google 登入頁）</li>
+        <li>按下 <kbd>F12</kbd> 或右鍵 → 選擇「檢查（Inspect）」</li>
+        <li>切換到「Elements」分頁</li>
+        <li>此時你看到的是 JavaScript 動態渲染後的 DOM 結構</li>
+      </ol>
+
+      <h3>小技巧：</h3>
+      <ul>
+        <li>按 <kbd>Ctrl + F</kbd> 可搜尋 <code>id="identifierNext"</code> 等字串</li>
+        <li>可手動展開 <code>&lt;div&gt;</code> 或 <code>&lt;button&gt;</code> 結構觀察變化</li>
+        <li>將滑鼠移到某個元素上，頁面會高亮顯示對應位置</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>方法二：用 Selenium 抓動態內容（程式內查看）</h2>
+      <p>你可以在程式內抓取目前瀏覽器渲染後的 HTML：</p>
+      <pre><code>html = driver.page_source
+print(html)</code></pre>
+      <p>這會印出目前畫面中已載入的 HTML 結構，包含經 JavaScript 動態生成的內容。</p>
+      <p><strong>注意：</strong>這不一定包含 AJAX 還沒回傳的資料，建議搭配 <code>WebDriverWait</code> 等待後再執行。</p>
+    </section>
+
+    <section>
+      <h2>方法三：使用 Chrome 的「Network」工具確認請求</h2>
+      <p>有些資料是透過 AJAX 動態請求載入的，可用 Network 分頁觀察：</p>
+      <ol>
+        <li>打開開發者工具 → 點選「Network」分頁</li>
+        <li>勾選「Preserve log」以保留記錄</li>
+        <li>刷新頁面，觀察是否有 fetch / xhr 請求出現</li>
+        <li>點選某一筆請求，檢查 Response → 可能包含 JSON 或 HTML 資料</li>
+      </ol>
+      <p>這能幫助你判斷資料來源是「一開始載入」還是「後續用 JS 插入」。</p>
+    </section>
+
+    <section>
+      <h2>方法四：使用 Chrome 插件「Live DOM Viewer」</h2>
+      <p>這是一個方便觀察 DOM 結構即時變化的工具。</p>
+      <ul>
+        <li><strong>插件名稱：</strong>Live DOM Viewer</li>
+        <li><strong>功能：</strong>在畫面右側顯示即時更新的 DOM 結構，便於追蹤元素變動</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>不建議的方法：用 view-source 檢查</h2>
+      <pre><code>view-source:https://accounts.google.com</code></pre>
+      <p>這個方法只能顯示最初的 HTML 原始碼，不包含任何 JavaScript 執行後新增的 DOM 結構。</p>
+      <p><strong>因此不適用於判斷 Selenium 抓不到元素的狀況。</strong></p>
+    </section>
+
+    <section>
+      <h2>小結</h2>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th>方法</th>
+            <th>說明</th>
+            <th>適合用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>F12 → Elements</td>
+            <td>查看實際渲染後的 DOM 結構</td>
+            <td>手動檢查元素屬性</td>
+          </tr>
+          <tr>
+            <td>driver.page_source</td>
+            <td>查看目前瀏覽器中的 HTML 結構</td>
+            <td>除錯 Selenium 抓不到元素的問題</td>
+          </tr>
+          <tr>
+            <td>Network 分頁</td>
+            <td>分析資料是否透過 AJAX 載入</td>
+            <td>抓取 JSON / API 請求結果</td>
+          </tr>
+          <tr>
+            <td>view-source</td>
+            <td>只看原始 HTML</td>
+            <td>不適合動態網頁除錯</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+</div>
+
+<div id="content4">
+  <body>
+    <h1>XPATH與CSS定位差異</h1>
+    <section>
+      <h2>XPath vs CSS Selector：自動化定位元素的兩大方式</h2>
+      <p>當你使用 Selenium 或其他自動化工具時，會用「定位器」來找網頁上的元素，最常見的兩種是：</p>
+      <ul>
+        <li>XPath（XML Path）</li>
+        <li>CSS Selector（CSS 選擇器）</li>
+      </ul>
+      <p>這兩種都能做到非常精準的元素定位，但在語法、可讀性和靈活度上有明顯差異。</p>
+    </section>
+
+    <section>
+      <h2>特性比較表</h2>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th>特性</th>
+            <th>XPath</th>
+            <th>CSS Selector</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>語法來源</td>
+            <td>XML/HTML 的路徑語法</td>
+            <td>CSS（網頁樣式表）語法</td>
+          </tr>
+          <tr>
+            <td>支援方向</td>
+            <td>支援從子往父、任意方向</td>
+            <td>只能從外層往內找</td>
+          </tr>
+          <tr>
+            <td>可讀性</td>
+            <td>稍難（像路徑描述）</td>
+            <td>較簡潔（像寫 CSS）</td>
+          </tr>
+          <tr>
+            <td>學習曲線</td>
+            <td>稍高</td>
+            <td>低（前端開發都熟）</td>
+          </tr>
+          <tr>
+            <td>執行效能</td>
+            <td>稍慢（解析層次深）</td>
+            <td>通常稍快</td>
+          </tr>
+          <tr>
+            <td>特殊支援</td>
+            <td>可使用 text()、contains()</td>
+            <td>不支援文字搜尋</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>定位語法範例（以 Google 登入頁為例）</h2>
+
+      <h3>目標：Email 輸入欄位 &lt;input id="identifierId"&gt;</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th>定位方式</th>
+            <th>語法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>XPath</td>
+            <td><code>//input[@id="identifierId"]</code></td>
+          </tr>
+          <tr>
+            <td>CSS</td>
+            <td><code>input#identifierId</code> 或 <code>#identifierId</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>目標：抓「下一步」按鈕，文字為「下一步」</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th>定位方式</th>
+            <th>語法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>XPath</td>
+            <td><code>//button[.//span[text()="下一步"]]</code></td>
+          </tr>
+          <tr>
+            <td>CSS</td>
+            <td>無法根據內文文字選擇（不支援）</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>目標：抓 class 同時為 btn 和 primary 的 &lt;button&gt;</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th>XPath</th>
+            <th>CSS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>//button[contains(@class, 'btn') and contains(@class, 'primary')]</code></td>
+            <td><code>button.btn.primary</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>XPath 的優勢</h2>
+      <ul>
+        <li>可以使用 <code>text()</code> 找文字（CSS 不支援）</li>
+        <li>可以從任意位置、任意方向找 DOM 節點</li>
+        <li>適合結構複雜的頁面</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>CSS Selector 的優勢</h2>
+      <ul>
+        <li>語法簡潔，與 CSS 語法相同</li>
+        <li>執行效能通常略快於 XPath</li>
+        <li>適合大多數定位需求</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Selenium 中的使用方式</h2>
+      <pre><code># 使用 XPath
+driver.find_element(By.XPATH, '//input[@id="identifierId"]')
+
+# 使用 CSS Selector
+driver.find_element(By.CSS_SELECTOR, 'input#identifierId')</code></pre>
+    </section>
+
+    <section>
+      <h2>建議選擇方式</h2>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr>
+            <th>需求</th>
+            <th>推薦使用</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>要根據文字內容選擇元素</td>
+            <td>XPath</td>
+          </tr>
+          <tr>
+            <td>結構複雜、需要從父找子</td>
+            <td>XPath</td>
+          </tr>
+          <tr>
+            <td>簡單的 ID、class 定位</td>
+            <td>CSS</td>
+          </tr>
+          <tr>
+            <td>熟悉前端 CSS 的開發者</td>
+            <td>CSS 更方便</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+</div>
+
+<div id="content5">
+    <h1>selenium基本功能</h1>
+    <section>
+      <h2>Selenium 常用功能列表（分類整理）</h2>
+    </section>
+
+    <section>
+      <h3>1. 基本瀏覽器操作</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>功能</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>driver.get(url)</td><td>開啟網頁</td></tr>
+          <tr><td>driver.quit()</td><td>關閉所有瀏覽器視窗</td></tr>
+          <tr><td>driver.close()</td><td>關閉當前頁籤</td></tr>
+          <tr><td>driver.refresh()</td><td>重新整理頁面</td></tr>
+          <tr><td>driver.back()</td><td>返回上一頁</td></tr>
+          <tr><td>driver.forward()</td><td>前進一頁</td></tr>
+          <tr><td>driver.maximize_window()</td><td>視窗最大化</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>2. 元素定位與操作</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>find_element(By.ID, "id")</td><td>依據 ID 定位單一元素</td></tr>
+          <tr><td>find_elements(...)</td><td>定位一組元素（回傳 list）</td></tr>
+          <tr><td>send_keys("文字")</td><td>模擬鍵盤輸入</td></tr>
+          <tr><td>click()</td><td>點擊元素</td></tr>
+          <tr><td>clear()</td><td>清除輸入欄位</td></tr>
+          <tr><td>submit()</td><td>提交表單（通常搭配 &lt;form&gt;）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>3. 等待機制（同步控制）</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>WebDriverWait(driver, timeout)</td><td>顯性等待</td></tr>
+          <tr><td>EC.presence_of_element_located(...)</td><td>元素出現在 DOM</td></tr>
+          <tr><td>EC.visibility_of_element_located(...)</td><td>元素可見</td></tr>
+          <tr><td>EC.element_to_be_clickable(...)</td><td>元素可點擊</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>4. 取得元素資訊</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>element.text</td><td>取得元素內的文字</td></tr>
+          <tr><td>element.get_attribute("href")</td><td>取得屬性值</td></tr>
+          <tr><td>element.tag_name</td><td>取得 HTML 標籤名</td></tr>
+          <tr><td>element.size, location</td><td>取得尺寸與位置</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>5. 滑鼠與鍵盤操作（進階）</h3>
+      <pre><code>from selenium.webdriver import ActionChains
+actions = ActionChains(driver)</code></pre>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>功能</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>move_to_element()</td><td>滑鼠移到元素上</td></tr>
+          <tr><td>click_and_hold()</td><td>長按元素</td></tr>
+          <tr><td>context_click()</td><td>模擬右鍵</td></tr>
+          <tr><td>double_click()</td><td>模擬雙擊</td></tr>
+          <tr><td>drag_and_drop()</td><td>拖曳元素</td></tr>
+          <tr><td>send_keys(Keys.ENTER)</td><td>模擬按鍵</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>6. 控制下拉選單</h3>
+      <pre><code>from selenium.webdriver.support.ui import Select
+select = Select(element)</code></pre>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>select_by_value()</td><td>依據 &lt;option value="X"&gt; 選項值選取</td></tr>
+          <tr><td>select_by_visible_text()</td><td>依據顯示文字選取</td></tr>
+          <tr><td>select_by_index()</td><td>依據索引（第幾個）選取</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>7. JavaScript 操作</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>driver.execute_script("JS語法")</td><td>執行 JavaScript，例如滾動頁面或取 DOM</td></tr>
+          <tr><td>return driver.execute_script("return document.title")</td><td>回傳值</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>8. 多頁籤 / iframe 操作</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>driver.switch_to.window(handle)</td><td>切換頁籤</td></tr>
+          <tr><td>driver.window_handles</td><td>所有頁籤列表</td></tr>
+          <tr><td>driver.switch_to.frame()</td><td>切入 &lt;iframe&gt;</td></tr>
+          <tr><td>driver.switch_to.default_content()</td><td>回主頁面</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>9. 截圖與儲存</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>driver.save_screenshot("file.png")</td><td>截圖整個頁面</td></tr>
+          <tr><td>element.screenshot("file.png")</td><td>截圖單一元素</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>10. Cookies 操作</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>方法</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>driver.get_cookies()</td><td>取得所有 cookies</td></tr>
+          <tr><td>driver.add_cookie({...})</td><td>新增 cookie</td></tr>
+          <tr><td>driver.delete_all_cookies()</td><td>清除所有 cookies</td></tr>
+        </tbody>
+      </table>
+    </section>
+</div>
+
+<div id="content6">
+    <h1>WebDriverWait使用</h1>
+    <section>
+      <h2>WebDriverWait 顯性等待（Explicit Wait）</h2>
+      <p><code>WebDriverWait(driver, 10).until(...)</code> 是 Selenium 中非常關鍵的一個<strong>顯性等待</strong>功能，主要用來「等待某個條件成立」才繼續往下執行。</p>
+    </section>
+
+    <section>
+      <h3>語法說明</h3>
+      <pre><code>WebDriverWait(driver, timeout).until(condition)</code></pre>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>參數</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>driver</td><td>你的瀏覽器驅動物件（例如 <code>webdriver.Chrome()</code>）</td></tr>
+          <tr><td>timeout</td><td>最長等待秒數，超過會丟出 TimeoutException</td></tr>
+          <tr><td>until()</td><td>傳入一個條件（通常用 expected_conditions 中的條件）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>使用情境：為什麼要等？</h3>
+      <p>網頁常常是「動態載入」的，元素一開始可能還沒出現在畫面上。如果你太快執行 <code>.click()</code> 或 <code>.send_keys()</code>，會報錯找不到元素。</p>
+      <p><strong>WebDriverWait</strong> 會每 0.5 秒檢查一次，直到：</p>
+      <ul>
+        <li>條件成立 → 繼續執行</li>
+        <li>超過時間 → 拋出錯誤</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>常用等待條件（expected_conditions 模組）</h3>
+      <pre><code>from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By</code></pre>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>條件</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>presence_of_element_located</td><td>元素出現在 DOM 中（不一定可見）</td></tr>
+          <tr><td>visibility_of_element_located</td><td>元素可見</td></tr>
+          <tr><td>element_to_be_clickable</td><td>元素存在且可見且可點</td></tr>
+          <tr><td>title_contains("關鍵字")</td><td>網頁標題包含指定文字</td></tr>
+          <tr><td>alert_is_present()</td><td>警示框出現</td></tr>
+          <tr><td>frame_to_be_available_and_switch_to_it</td><td>iframe 出現並自動切換</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>實例：等 Email 輸入欄位出現</h3>
+      <pre><code>email_input = WebDriverWait(driver, 10).until(
+    EC.visibility_of_element_located((By.ID, "identifierId"))
+)
+email_input.send_keys("xxx@gmail.com")</code></pre>
+      <p>這段會等最多 10 秒，直到 <code>id="identifierId"</code> 的輸入欄位可見，再執行輸入。</p>
+    </section>
+
+    <section>
+      <h3>為什麼不用 time.sleep()？</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>比較項目</th><th>time.sleep()</th><th>WebDriverWait</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>等待邏輯</td><td>固定等 X 秒</td><td>動態檢查，條件成立即繼續</td></tr>
+          <tr><td>效率</td><td>浪費時間</td><td>更快且更穩定</td></tr>
+          <tr><td>錯誤處理</td><td>可能仍報錯</td><td>可設定等待條件避免錯誤</td></tr>
+          <tr><td>彈性</td><td>無條件判斷</td><td>支援條件判斷（可見、可點、存在）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>補充：lambda 自訂條件</h3>
+      <pre><code>WebDriverWait(driver, 10).until(
+    lambda d: d.find_element(By.ID, "myid").is_displayed()
+)</code></pre>
+      <p>你也可以自定等待邏輯，例如元素出現並顯示時才繼續。</p>
+    </section>
+
+    <section>
+      <h3>小結</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>功能</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>WebDriverWait(driver, 10).until(...)</td><td>等待「某個條件」成立，最多等 10 秒</td></tr>
+          <tr><td>搭配 expected_conditions</td><td>可等元素「可見」、「可點」、「存在」等</td></tr>
+          <tr><td>適合動態載入環境</td><td>避免元素尚未準備好時操作出錯</td></tr>
+        </tbody>
+      </table>
+    </section>
+</div>
+
+<div id="content7">
+    <h1>excepted conditions(EC)介紹</h1>
+    <section>
+      <h2>expected_conditions（EC）介紹</h2>
+      <p><code>expected_conditions</code>（簡寫為 <code>EC</code>）是 Selenium 中的模組，常與 <code>WebDriverWait</code> 搭配使用，用於<strong>顯性等待（Explicit Wait）</strong>。</p>
+      <p>它提供一系列等待條件，用來等待以下狀態：</p>
+      <ul>
+        <li>元素是否出現？</li>
+        <li>是否可見？</li>
+        <li>是否可以點擊？</li>
+        <li>標題是否包含關鍵字？</li>
+        <li>alert 是否彈出？</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>基本語法範例</h3>
+      <pre><code>from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+element = WebDriverWait(driver, 10).until(
+    EC.visibility_of_element_located((By.ID, "login"))
+)</code></pre>
+      <p>這段程式碼會等待最多 10 秒，直到 <code>id="login"</code> 的元素可見為止。</p>
+    </section>
+
+    <section>
+      <h3>常用 expected_conditions 功能整理表</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>功能條件（函式）</th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>presence_of_element_located(locator)</td><td>元素存在於 DOM 中（不一定可見）</td></tr>
+          <tr><td>visibility_of_element_located(locator)</td><td>元素存在且可見（推薦使用）</td></tr>
+          <tr><td>element_to_be_clickable(locator)</td><td>元素可見並且可以被點擊</td></tr>
+          <tr><td>text_to_be_present_in_element(locator, text)</td><td>元素中包含特定文字</td></tr>
+          <tr><td>title_contains(text)</td><td>頁面標題包含指定文字</td></tr>
+          <tr><td>title_is(text)</td><td>頁面標題完全符合指定文字</td></tr>
+          <tr><td>alert_is_present()</td><td>JavaScript alert 彈出</td></tr>
+          <tr><td>frame_to_be_available_and_switch_to_it(locator)</td><td>iframe 出現並自動切換進去</td></tr>
+          <tr><td>invisibility_of_element_located(locator)</td><td>元素變為不可見</td></tr>
+          <tr><td>staleness_of(element)</td><td>元素已從 DOM 中移除</td></tr>
+          <tr><td>element_located_selection_state_to_be(locator, state)</td><td>等待元素變為選中/未選中狀態</td></tr>
+          <tr><td>element_to_be_selected(element)</td><td>等待元素被選取</td></tr>
+          <tr><td>element_attribute_to_include(locator, "disabled")</td><td>某屬性包含某值</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>常見搭配用法</h3>
+
+      <h4>等一個按鈕可以點：</h4>
+      <pre><code>WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.ID, "submitBtn"))
+)</code></pre>
+
+      <h4>等某個 &lt;div&gt; 出現「處理中完成」文字：</h4>
+      <pre><code>WebDriverWait(driver, 10).until(
+    EC.text_to_be_present_in_element((By.ID, "status"), "處理完成")
+)</code></pre>
+
+      <h4>等 iframe 出現並切換：</h4>
+      <pre><code>WebDriverWait(driver, 10).until(
+    EC.frame_to_be_available_and_switch_to_it((By.ID, "myFrame"))
+)</code></pre>
+    </section>
+
+    <section>
+      <h3>小結建議</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <thead>
+          <tr><th>想做的事</th><th>建議使用的條件</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>元素已經出現在頁面</td><td>presence_of_element_located</td></tr>
+          <tr><td>元素真的可見、可操作</td><td>visibility_of_element_located</td></tr>
+          <tr><td>可點擊</td><td>element_to_be_clickable</td></tr>
+          <tr><td>iframe 可用了</td><td>frame_to_be_available_and_switch_to_it</td></tr>
+          <tr><td>頁面標題出現關鍵字</td><td>title_contains</td></tr>
+          <tr><td>等 JavaScript 彈出警告</td><td>alert_is_present</td></tr>
+        </tbody>
+      </table>
+    </section>
+</div>
+
+<div id="content8">
+  <h1>selenium.webdriver.common.by 模組介紹</h2>
+      <section>
+      <h2>selenium.webdriver.common.by 模組介紹</h2>
+      <p><code>By</code> 是 Selenium 中專門用來指定元素定位方式的模組。</p>
+      <p>在使用 <code>find_element()</code> 或 <code>WebDriverWait</code> 等功能時，你需要告訴 Selenium 要用什麼方式找元素（例如 ID、class、XPath、CSS Selector 等），這時就會用到 <code>By</code>。</p>
+    </section>
+
+    <section>
+      <h3>基本語法格式</h3>
+      <pre><code>from selenium.webdriver.common.by import By
+
+driver.find_element(By.ID, "login")
+driver.find_element(By.CLASS_NAME, "btn")
+driver.find_element(By.XPATH, "//input[@type='text']")
+driver.find_element(By.CSS_SELECTOR, ".myClass")</code></pre>
+    </section>
+
+    <section>
+      <h3>By 模組支援的定位方式總表</h3>
+      <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+          <tr>
+            <th>By.方法</th>
+            <th>說明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>By.ID</td><td>用元素的 id 屬性</td></tr>
+          <tr><td>By.NAME</td><td>用元素的 name 屬性</td></tr>
+          <tr><td>By.CLASS_NAME</td><td>用元素的 class 名稱（不能有空格）</td></tr>
+          <tr><td>By.TAG_NAME</td><td>用 HTML 標籤名（如 input, div, button）</td></tr>
+          <tr><td>By.LINK_TEXT</td><td>精確比對超連結的文字</td></tr>
+          <tr><td>By.PARTIAL_LINK_TEXT</td><td>部分比對超連結的文字</td></tr>
+          <tr><td>By.XPATH</td><td>使用 XPath（結構化語法）</td></tr>
+          <tr><td>By.CSS_SELECTOR</td><td>使用 CSS Selector（非常靈活）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>各方式簡易範例</h3>
+      <pre><code># HTML: <input id="email" name="userEmail" class="input-text" type="text">
+driver.find_element(By.ID, "email")
+driver.find_element(By.NAME, "userEmail")
+driver.find_element(By.CLASS_NAME, "input-text")
+driver.find_element(By.TAG_NAME, "input")
+
+# 假設超連結是 <a href="#">登入帳號</a>
+driver.find_element(By.LINK_TEXT, "登入帳號")
+driver.find_element(By.PARTIAL_LINK_TEXT, "登入")
+
+# XPath 和 CSS Selector
+driver.find_element(By.XPATH, "//input[@id='email']")
+driver.find_element(By.CSS_SELECTOR, "#email")</code></pre>
+    </section>
+
+    <section>
+      <h3>小提示</h3>
+      <ul>
+        <li><strong>By.ID</strong> 是最快、最穩定的方式（如果有 id）</li>
+        <li><strong>By.CSS_SELECTOR</strong> 和 <strong>By.XPATH</strong> 最具彈性，可選父子結構、屬性、索引等</li>
+        <li>不建議使用 <strong>By.CLASS_NAME</strong> 定位多個 class 的元素（因為 class 名不能含空格）</li>
+        <li><strong>By.LINK_TEXT</strong> 僅適用於 &lt;a&gt; 超連結元素</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>搭配 WebDriverWait 使用範例</h3>
+      <pre><code>from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+element = WebDriverWait(driver, 10).until(
+    EC.visibility_of_element_located((By.ID, "login-button"))
+)</code></pre>
+    </section>
+
+    <section>
+      <h3>小結</h3>
+      <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+          <tr><th>想找的東西</th><th>建議用的 By</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>明確的 id</td><td>By.ID</td></tr>
+          <tr><td>有 name 屬性</td><td>By.NAME</td></tr>
+          <tr><td>class 唯一、簡單</td><td>By.CLASS_NAME</td></tr>
+          <tr><td>結構複雜</td><td>By.XPATH 或 By.CSS_SELECTOR</td></tr>
+          <tr><td>文字連結</td><td>By.LINK_TEXT 或 By.PARTIAL_LINK_TEXT</td></tr>
+        </tbody>
+      </table>
+    </section>
+</div>
+
+<div id="content9">
+  <h1>Selenium 勾選 checkbox（核取方塊）</h1>
+    <section>
+      <h2>Selenium 勾選 checkbox（核取方塊）</h2>
+      <p>你只需要先定位它，然後使用 <code>.click()</code> 方法即可。</p>
+    </section>
+
+    <section>
+      <h3>基本操作步驟</h3>
+      <ol>
+        <li>找到 checkbox 元素</li>
+        <li>確認它沒被打勾</li>
+        <li>用 <code>.click()</code> 打勾</li>
+      </ol>
+    </section>
+
+    <section>
+      <h3>範例程式碼</h3>
+      <pre><code>from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+driver = webdriver.Chrome()
+driver.get("https://example.com")  # 換成你自己的網址
+
+# 等待 checkbox 出現
+checkbox = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "acceptTerms"))  # 改成實際的 ID
+)
+
+# 如果尚未被勾選，就點一下
+if not checkbox.is_selected():
+    checkbox.click()</code></pre>
+    </section>
+
+    <section>
+      <h3>如何判斷 checkbox 是否被勾選</h3>
+      <pre><code>if checkbox.is_selected():
+    print("已打勾")
+else:
+    print("尚未打勾")</code></pre>
+    </section>
+
+    <section>
+      <h3>支援多種定位方式</h3>
+      <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+          <tr><th>HTML 屬性範例</th><th>Selenium 寫法</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>&lt;input id="agree" type="checkbox"&gt;</td><td>By.ID, "agree"</td></tr>
+          <tr><td>&lt;input name="subscribe" type="checkbox"&gt;</td><td>By.NAME, "subscribe"</td></tr>
+          <tr><td>&lt;input class="checkbox-item" type="checkbox"&gt;</td><td>By.CSS_SELECTOR, ".checkbox-item"</td></tr>
+          <tr><td>HTML 複雜，位置固定</td><td>By.XPATH, "//input[@type='checkbox'][1]"</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>CSS 選擇器進階選法</h3>
+      <ul>
+        <li>第一個 checkbox: <code>input[type="checkbox"]:nth-of-type(1)</code></li>
+        <li>勾選特定 label 的 checkbox 可使用 XPath 搭配 label 文字</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>補充：打開 checkbox 對應的 label</h3>
+      <p>有時候 checkbox 被隱藏，實際點擊的是 label 或 div。這種情況可以點擊 label：</p>
+      <pre><code>&lt;label for="agree"&gt;我同意&lt;/label&gt;
+&lt;input id="agree" type="checkbox"&gt;</code></pre>
+      <p>可直接點 label 或用 JavaScript 模擬勾選：</p>
+      <pre><code>driver.find_element(By.CSS_SELECTOR, "label[for='agree']").click()</code></pre>
+    </section>
+
+    <section>
+      <h3>小結</h3>
+      <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+          <tr><th>任務</th><th>方法</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>找 checkbox 元素</td><td>find_element(By.ID / NAME / XPATH / CSS_SELECTOR)</td></tr>
+          <tr><td>點擊勾選</td><td>.click()</td></tr>
+          <tr><td>判斷是否已勾選</td><td>.is_selected()</td></tr>
+          <tr><td>checkbox 被包在 label 裡</td><td>點擊 label 或使用 JavaScript</td></tr>
+        </tbody>
+      </table>
+    </section>
+</div>
+
+<div id="content10">
+    <section>
+      <h2>Selenium 自動化控制瀏覽器並勾選 checkbox</h2>
+      <p>這段程式碼的目的是用 Selenium 自動化控制瀏覽器，並勾選一個 checkbox，這是你在網站 <a href="https://the-internet.herokuapp.com/checkboxes" target="_blank">the-internet.herokuapp.com</a> 上進行的動作。</p>
+      <p>接下來，我將逐行說明每一部分的功能：</p>
+    </section>
+
+    <section>
+      <h3>1. 載入必要的函式庫</h3>
+      <pre><code>from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import undetected_chromedriver as uc
+import time</code></pre>
+      <ul>
+        <li><strong>By</strong>: 提供了一些定位元素的方式，比如 <code>By.ID</code>, <code>By.XPATH</code>, <code>By.CSS_SELECTOR</code> 等。</li>
+        <li><strong>WebDriverWait</strong>: 用來設置等待條件，確保指定的元素出現並且可操作，防止操作過早或過晚。</li>
+        <li><strong>expected_conditions as EC</strong>: 提供常用的條件方法，例如 <code>element_to_be_clickable</code>，來判斷元素是否符合某些條件。</li>
+        <li><strong>undetected_chromedriver as uc</strong>: 用來啟動瀏覽器並避免檢測自動化行為。這可以防止網站因為識別到自動化行為而封鎖你。</li>
+        <li><strong>time</strong>: 用來做延時處理。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>2. 啟動瀏覽器</h3>
+      <pre><code># 啟動瀏覽器
+options = uc.ChromeOptions()
+driver = uc.Chrome(options=options)</code></pre>
+      <p><strong>uc.ChromeOptions()</strong>: 這個設置用來配置 Chrome 瀏覽器選項。可以讓你設置無頭模式、代理伺服器等配置。此處我們沒做特別設定。</p>
+      <p><strong>driver = uc.Chrome(options=options)</strong>: 用 undetected_chromedriver 啟動 Chrome 瀏覽器並返回一個 driver 實例，這樣我們就可以用來控制瀏覽器。</p>
+    </section>
+
+    <section>
+      <h3>3. 打開網站</h3>
+      <pre><code>driver.get("https://the-internet.herokuapp.com/checkboxes")</code></pre>
+      <p><strong>driver.get()</strong>: 用來指示瀏覽器打開指定的 URL。這裡我們打開的是一個包含多個 checkbox 的測試網頁。</p>
+    </section>
+
+    <section>
+      <h3>4. 等待第一個 checkbox 變得可點擊</h3>
+      <pre><code>checkbox1 = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, "#checkboxes > input[type=checkbox]:nth-child(1)"))
+)</code></pre>
+      <p><strong>WebDriverWait(driver, 10)</strong>: 設置顯式等待，10 表示最大等待時間為 10 秒。程式會持續等候，直到滿足條件或超過 10 秒。</p>
+      <p><strong>EC.element_to_be_clickable()</strong>: 這個條件判斷元素是否已經可點擊，當元素可以點擊時，才會繼續執行後續操作。</p>
+      <p><strong>(By.CSS_SELECTOR, "#checkboxes > input[type=checkbox]:nth-child(1)")</strong>: 這是用 CSS Selector 定位頁面中的第一個 checkbox。</p>
+    </section>
+
+    <section>
+      <h3>5. 點選 checkbox（如果沒被打勾）</h3>
+      <pre><code>if not checkbox1.is_selected():
+    checkbox1.click()</code></pre>
+      <p><strong>checkbox1.is_selected()</strong>: 這個方法檢查該 checkbox 是否已經被選中。如果已經選中，返回 True，否則返回 False。</p>
+      <p><strong>checkbox1.click()</strong>: 如果該 checkbox 還沒被選中，則模擬點擊操作來勾選它。</p>
+    </section>
+
+    <section>
+      <h3>6. 輸出選取狀態</h3>
+      <pre><code>print("Checkbox 1 選取狀態：", checkbox1.is_selected())</code></pre>
+      <p>再次檢查 checkbox 的選取狀態，並輸出結果。這樣可以確認 checkbox 是否已經被正確勾選。</p>
+    </section>
+
+    <section>
+      <h3>7. 等待 5 秒鐘觀察結果</h3>
+      <pre><code>time.sleep(5)</code></pre>
+      <p>程式會在這裡暫停 5 秒鐘。這樣可以讓你在關閉瀏覽器之前觀察到選取 checkbox 的結果。如果你不需要觀察過程，可以省略或縮短這段時間。</p>
+    </section>
+
+    <section>
+      <h3>8. 關閉瀏覽器</h3>
+      <pre><code>driver.quit()</code></pre>
+      <p><strong>driver.quit()</strong>: 這行程式會關閉瀏覽器，並且釋放瀏覽器實例所佔用的資源。如果你只想關閉當前頁面，而不是整個瀏覽器，可以使用 <code>driver.close()</code>。</p>
+    </section>
+
+    <section>
+      <h3>總結</h3>
+      <p>整個流程的邏輯是：</p>
+      <ol>
+        <li>啟動瀏覽器並打開指定頁面。</li>
+        <li>等待頁面上的第一個 checkbox 元素變得可點擊。</li>
+        <li>如果 checkbox 沒有被勾選，就模擬點擊來勾選它。</li>
+        <li>輸出 checkbox 的選取狀態。</li>
+        <li>暫停 5 秒鐘，讓你有時間觀察。</li>
+        <li>關閉瀏覽器。</li>
+      </ol>
+    </section>
+</div>
+
+<div id="content11">
+  <section>
+    <h1>Selenium option(下拉式選單)範例程式</h1>
+    <p>這段程式碼的目的是自動化操作一個網頁中的下拉選單，選擇其中的某個選項，並輸出選擇的選項。下面是對每一部分的逐行解釋。</p>
+
+    <h2>1. 載入必要的庫</h2>
+    <pre><code>
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import undetected_chromedriver as uc
+    </code></pre>
+    <ul>
+      <li><strong>webdriver</strong>：Selenium 控制瀏覽器的核心模組。</li>
+      <li><strong>By</strong>：提供定位網頁元素的多種方式。</li>
+      <li><strong>WebDriverWait</strong>：設置顯式等待條件，確保操作元素前已加載完成。</li>
+      <li><strong>EC</strong>：常見的等待條件，例如等待元素可點擊。</li>
+      <li><strong>undetected_chromedriver</strong>：用於啟動 Chrome 並繞過自動化檢測。</li>
+    </ul>
+
+    <h2>2. 啟動瀏覽器</h2>
+    <pre><code>
+options = uc.ChromeOptions()
+driver = uc.Chrome(options=options)
+    </code></pre>
+    <p>這段程式碼使用 undetected_chromedriver 啟動 Chrome 瀏覽器。</p>
+
+    <h2>3. 打開網站</h2>
+    <pre><code>
+driver.get("https://the-internet.herokuapp.com/dropdown")
+    </code></pre>
+    <p>透過 <code>driver.get()</code> 開啟指定網址。</p>
+
+    <h2>4. 等待下拉選單加載完畢</h2>
+    <pre><code>
+dropdown = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "dropdown"))
+)
+    </code></pre>
+    <ul>
+      <li>最多等待 10 秒鐘，直到 ID 為 <code>dropdown</code> 的元素出現在頁面中。</li>
+    </ul>
+
+    <h2>5. 等待 Option 2 加載並點擊</h2>
+    <pre><code>
+option2 = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, "#dropdown > option:nth-child(3)"))
+)
+    </code></pre>
+    <p>這裡選擇第三個 <code>&lt;option&gt;</code> 元素，也就是 Option 2，等待其變得可點擊。</p>
+
+    <h2>6. 點擊 Option 2</h2>
+    <pre><code>
+option2.click()
+    </code></pre>
+    <p>模擬點擊 Option 2。</p>
+
+    <h2>7. 輸出選擇的選項</h2>
+    <pre><code>
+selected_option = driver.find_element(By.CSS_SELECTOR, "#dropdown option:checked")
+print("選擇的選項是:", selected_option.text)
+    </code></pre>
+    <ul>
+      <li>使用 CSS 選擇器 <code>option:checked</code> 找出目前被選中的項目。</li>
+      <li>使用 <code>.text</code> 取得該選項的文字並印出。</li>
+    </ul>
+
+    <h2>8. 暫停 3 秒鐘觀察結果</h2>
+    <pre><code>
+import time
+time.sleep(3)
+    </code></pre>
+    <p>讓執行停頓 3 秒鐘，以觀察選擇效果。</p>
+
+    <h2>9. 關閉瀏覽器</h2>
+    <pre><code>
+driver.quit()
+    </code></pre>
+    <p>關閉整個瀏覽器並釋放資源。</p>
+
+    <h2>總結</h2>
+    <ul>
+      <li>啟動瀏覽器並開啟測試網頁。</li>
+      <li>等待下拉選單載入。</li>
+      <li>等待並選擇第三個選項（Option 2）。</li>
+      <li>輸出被選中的選項。</li>
+      <li>觀察結果後關閉瀏覽器。</li>
+    </ul>
+  </section>
+</div>
+
+<div id="content12">
+  <section>
+    <h1>Selenium option(下拉式選單)改進建議</h1>
+
+    <p>這段程式碼邏輯上是正確的，能夠順利地模擬選擇下拉選單中的 Option 2。不過，這裡有一些小的潛在問題或者最佳實踐，我會指出來並做一些改善：</p>
+
+    <h2>可能的問題：</h2>
+    <ul>
+      <li><code>option:nth-child(2)</code>：&lt;select&gt; 標籤中的 &lt;option&gt; 元素在 DOM 結構中是從第1個 &lt;option&gt; 開始的，但如果你有 &lt;option&gt; 標籤之外的元素（例如空的 div 或其他），這個選擇器可能會不準確。</li>
+      <li><code>driver.quit()</code>：這行程式碼會關閉所有的瀏覽器視窗，如果你希望只關閉當前視窗可以用 <code>driver.close()</code>。</li>
+    </ul>
+
+    <h2>建議改善：</h2>
+    <ul>
+      <li>使用 <code>Select</code> 類別：Selenium 提供了 <code>Select</code> 類別來更方便地操作下拉選單。它能夠避免使用 CSS Selector 和 XPath，提供更高層次的 API 來處理下拉選單。</li>
+    </ul>
+
+    <h2>改進後的程式碼：</h2>
+    <pre>
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
+import undetected_chromedriver as uc
+import time
+
+# 啟動瀏覽器
+options = uc.ChromeOptions()
+driver = uc.Chrome(options=options)
+
+# 打開網站
+driver.get("https://the-internet.herokuapp.com/dropdown")
+
+# 等待下拉選單加載完畢
+dropdown = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "dropdown"))
+)
+
+# 使用 Select 類別來處理下拉選單
+select = Select(dropdown)
+
+# 選擇第二個選項 (Option 2)
+select.select_by_index(1)  # 索引從0開始，所以第二個選項是1
+
+# 輸出選擇的選項
+selected_option = select.first_selected_option
+print("選擇的選項是:", selected_option.text)
+
+# 暫停 3 秒鐘觀察結果
+time.sleep(3)
+
+# 關閉瀏覽器
+driver.quit()
+    </pre>
+
+    <h2>改進的關鍵點：</h2>
+    <ul>
+      <li><code>Select</code> 類別：這是專為處理 <code>select</code> 下拉選單而設計的類別，提供了更高層次的 API 來操作選單，讓程式更簡潔。</li>
+      <li><code>select.select_by_index(1)</code> 會選擇第二個選項，index 是從 0 開始的。</li>
+      <li><code>select.first_selected_option</code> 可以直接獲取當前被選中的選項。</li>
+      <li><code>time.sleep(3)</code>：保持 3 秒鐘的延時，可以讓你有時間觀察操作結果。如果你不需要這個等待，或可以減少這段時間。</li>
+    </ul>
+
+    <p>這樣的寫法會更加簡潔和易於維護，同時也更具可讀性。</p>
+  </section>
+</div>
+
+<div id="content13">
+  <section>
+    <h1>Selenium option(下拉式選單)範例程式(改進)</h1>
+
+    <p>這段程式碼是用 Selenium 和 undetected_chromedriver 開啟瀏覽器，並對一個包含下拉選單的網頁進行自動化操作。下面是對每一行程式碼的詳細解釋：</p>
+
+    <h2>1. 載入必要的函式庫</h2>
+    <pre>
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
+import undetected_chromedriver as uc
+    </pre>
+    <p><strong>selenium.webdriver</strong>：這是 Selenium 的基本庫，用於控制瀏覽器。</p>
+    <p><strong>By</strong>：提供多種方法來定位網頁元素（例如：ID、Class Name、XPath、CSS Selector 等）。</p>
+    <p><strong>WebDriverWait</strong>：用來設置顯式等待條件，等待某個元素加載完成或達到某個狀態才繼續執行程式。</p>
+    <p><strong>expected_conditions（簡寫為 EC）</strong>：提供常見的條件方法，例如等待元素可見、可點擊等。</p>
+    <p><strong>Select</strong>：這是 Selenium 提供的一個類，用來操作 select 元素（即下拉選單）。</p>
+    <p><strong>undetected_chromedriver as uc</strong>：這是用來啟動 Chrome 瀏覽器的一個庫，特別用於避開網站檢測自動化行為。</p>
+
+    <h2>2. 啟動瀏覽器</h2>
+    <pre>
+options = uc.ChromeOptions()
+driver = uc.Chrome(options=options)
+    </pre>
+    <p><strong>uc.ChromeOptions()</strong>：用來設定 Chrome 瀏覽器的選項。這裡創建了一個 options 物件，雖然沒有設置具體選項，但可以在這裡添加其他配置（例如無頭模式、代理伺服器等）。</p>
+    <p><strong>driver = uc.Chrome(options=options)</strong>：使用 undetected_chromedriver 來啟動 Chrome 瀏覽器。這樣可以避開一些網站對自動化工具的檢測，防止被封鎖。</p>
+
+    <h2>3. 打開指定的網站</h2>
+    <pre>
+driver.get("https://the-internet.herokuapp.com/dropdown")
+    </pre>
+    <p><strong>driver.get("https://the-internet.herokuapp.com/dropdown")</strong>：這行命令會打開指定的 URL，也就是包含下拉選單的測試頁面。瀏覽器會加載這個網頁並顯示給你。</p>
+
+    <h2>4. 等待下拉選單加載完畢</h2>
+    <pre>
+dropdown = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "dropdown"))
+)
+    </pre>
+    <p><strong>WebDriverWait(driver, 10)</strong>：創建一個顯式等待，等待最多 10 秒，直到指定的條件滿足為止。</p>
+    <p><strong>EC.presence_of_element_located((By.ID, "dropdown"))</strong>：這個條件會檢查指定的元素（這裡是 ID 為 dropdown 的元素）是否出現在頁面上。如果元素加載完畢，就會繼續執行後面的程式。</p>
+    <p>這行程式碼的目的是等待頁面中的下拉選單（ID 為 dropdown）加載完成，並將其保存在 dropdown 變數中。</p>
+
+    <h2>5. 使用 Select 類別來操作下拉選單</h2>
+    <pre>
+select = Select(dropdown)
+    </pre>
+    <p><strong>Select(dropdown)</strong>：這行程式碼創建了一個 Select 物件，並將我們之前獲取的 dropdown 元素傳入。這樣就可以使用 Select 類提供的方便方法來操作下拉選單，而不需要自己寫很多 CSS Selector 或 XPath。</p>
+
+    <h2>6. 選擇下拉選單中的第一個選項</h2>
+    <pre>
+select.select_by_index(1)  # 選擇 "Option 1"（如果有的話）
+    </pre>
+    <p><strong>select.select_by_index(1)</strong>：Select 類提供了多種選擇選項的方法，這裡我們使用 select_by_index()，它根據選項的索引來選擇一個選項。索引從 0 開始，所以這裡的 1 代表選擇下拉選單中的第二個選項，即 "Option 1"。</p>
+    <p><strong>注意：</strong>select_by_index(0) 會選擇第一個選項 "Option 0"。</p>
+
+    <h2>7. 輸出選擇的選項</h2>
+    <pre>
+selected_option = select.first_selected_option
+print("選擇的選項是:", selected_option.text)
+    </pre>
+    <p><strong>select.first_selected_option</strong>：這會返回當前被選中的選項（即 Select 元素中被選中的 &lt;option&gt;）。</p>
+    <p><strong>selected_option.text</strong>：用來獲取被選中選項的文本內容。</p>
+    <p><strong>print("選擇的選項是:", selected_option.text)</strong>：將選中的選項文本打印出來，讓你能夠確認程式是否選擇了正確的選項。</p>
+
+    <h2>8. 暫停 3 秒鐘觀察結果</h2>
+    <pre>
+import time
+time.sleep(3)
+    </pre>
+    <p><strong>time.sleep(3)</strong>：這會讓程式在這裡暫停 3 秒，這樣你可以在瀏覽器中觀察選中的選項。這一行的目的是讓你能夠確認操作結果，避免過快關閉瀏覽器。</p>
+
+    <h2>9. 關閉瀏覽器</h2>
+    <pre>
+driver.quit()
+    </pre>
+    <p><strong>driver.quit()</strong>：這會關閉整個瀏覽器實例。這不僅會關閉當前的窗口，還會結束所有由 Selenium 控制的瀏覽器進程，釋放所有的資源。</p>
+
+    <h2>總結</h2>
+    <p>整段程式碼的目的是：</p>
+    <ul>
+        <li>使用 undetected_chromedriver 啟動 Chrome 瀏覽器，並打開包含下拉選單的網頁。</li>
+        <li>等待下拉選單元素加載完成。</li>
+        <li>使用 Selenium 的 Select 類來選擇下拉選單中的第二個選項。</li>
+        <li>輸出選中的選項，並確認選擇的結果。</li>
+        <li>在關閉瀏覽器前暫停幾秒鐘，以便觀察結果。</li>
+    </ul>
+  </section>
+</div>
+
+<div id="content14">
+  <h1>The Internet HerokuApp 練習網站簡介</h1>
+  <section>
+    <h2><a href="https://the-internet.herokuapp.com/" tabindex="_blank">The Internet HerokuApp 練習網站</a></h1>
+    <p>這是一個由 Selenium 官方與社群合作維護的練習網站，專為自動化測試與爬蟲練習設計，涵蓋了各種常見且實用的功能頁面，包括：</p>
+    <ul>
+      <li>Checkboxes（複選框）</li>
+      <li>Dropdown（下拉選單）</li>
+      <li>Tables（資料表格）</li>
+      <li>Forms / Authentication（表單與認證）</li>
+      <li>Redirect / Status Codes（重導與 HTTP 狀態碼）</li>
+      <li>Deep DOM / Infinite Scroll / Dynamic Loading 等等</li>
+    </ul>
+    <p>這些頁面設計簡潔，但涵蓋範圍廣泛，非常適合使用 Selenium 等自動化框架進行練習與測試。</p>
+  </section>
+
+  <section>
+    <h2>官方頁面功能列表</h2>
+    <p>網站首頁列出了所有可供練習的範例，例如：</p>
+    <pre><code>
+Available Examples
+  Add/Remove Elements
+  Checkboxes
+  Dropdown
+  Tables
+  Dynamic Loading
+  Large & Deep DOM
+  Redirect
+  Status Codes
+  …更多
+    </code></pre>
+    <p>使用者可以點擊各個連結，進入對應的功能頁面進行練習。</p>
+  </section>
+
+  <section>
+    <h2>使用方向建議</h2>
+    <p>你可以透過 Selenium 控制瀏覽器：</p>
+    <ul>
+      <li>練習 #checkbox 元素互動</li>
+      <li>操作下拉選單選項</li>
+      <li>對分頁、表格、表單進行選取與提交</li>
+      <li>模擬使用者點擊、等待異步載入、捕捉錯誤碼等</li>
+    </ul>
+    <p>例如：若你想練習分頁功能，雖然該網站沒有直接提供 pagination 頁面，但像「Deep DOM」、「Dynamic Loading」等互動型頁面也非常適合作為練習對象。</p>
+  </section>
+
+  <section>
+    <h2>小結</h2>
+    <table border="1" cellpadding="6">
+      <tr>
+        <th>項目</th>
+        <th>說明</th>
+      </tr>
+      <tr>
+        <td>網站名稱</td>
+        <td>The Internet (the-internet.herokuapp.com)</td>
+      </tr>
+      <tr>
+        <td>用途</td>
+        <td>練習常見網頁互動場景，與 Selenium / 自動化測試相關</td>
+      </tr>
+      <tr>
+        <td>內容涵蓋範例</td>
+        <td>checkbox、dropdown、表格、動態載入、HTTP 狀態頁等</td>
+      </tr>
+      <tr>
+        <td>適合用途</td>
+        <td>自動化爬蟲、測試腳本練習、網頁互動學習</td>
+      </tr>
+    </table>
+  </section>
+</div>

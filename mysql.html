@@ -1,0 +1,233 @@
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ Python: Python 對 MySQL 建立資料庫</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content2">⭕ MySQL: MySQL的users and Privileges設定</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content3">⭕ Python: 輸入資料欄位驗證或格式處理</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div id="content1">
+    <h1>Python: Python 對 MySQL 建立資料庫</h1>
+    <h2>MySQL 端需要準備的事項：</h2>
+    <ul>
+        <li>已安裝 MySQL 伺服器（例如 MySQL Server 8.0）。</li>
+        <li>有一個可以連線的帳號（如 root），並知道：
+            <ul>
+                <li>主機（通常是 localhost）</li>
+                <li>使用者名稱與密碼</li>
+                <li>權限：該帳號需要有 CREATE DATABASE 權限。</li>
+            </ul>
+        </li>
+        <li>確認 MySQL 允許你從 Python 端的 IP 或本地連線。</li>
+    </ul>
+
+    <h2>Python 端準備</h2>
+    <p>安裝 MySQL 的 Python 連線套件（推薦使用 <code>mysql-connector-python</code> 或 <code>pymysql</code>）：</p>
+
+    <pre><code>pip install mysql-connector-python</code></pre>
+
+    <h2>建立資料庫的範例程式碼（使用 mysql-connector-python）</h2>
+
+    <pre><code>import mysql.connector
+
+# 建立連線（連到 MySQL，不指定資料庫）
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="your_password"  # 替換成你的密碼
+)
+
+cursor = conn.cursor()
+
+# 建立資料庫
+cursor.execute("CREATE DATABASE IF NOT EXISTS test_db")
+
+print("資料庫建立完成")
+
+# 關閉連線
+cursor.close()
+conn.close()</code></pre>
+
+    <div class="note">
+        <strong>注意事項：</strong>
+        <ul>
+            <li>如果你遇到權限錯誤（如 Access denied），請確認 MySQL 使用者有 CREATE 權限。</li>
+            <li>預設 MySQL 只允許來自本機連線（localhost）。若你的 Python 程式在其他主機，MySQL 必須設定允許遠端連線。</li>
+            <li><code>CREATE DATABASE IF NOT EXISTS</code> 可以避免資料庫已存在時出錯。</li>
+        </ul>
+    </div>
+</div>
+
+<div id="content2">
+    <h1>MySQL: MySQL的users and Privileges設定</h1>
+    <h2>1. Object Rights（物件權限）</h2>
+    <div class="section">
+        <p>是針對資料表（table）、檢視（view）、儲存程序（stored procedure）等具體物件的操作權限。例如對某個資料表 <code>employees</code> 可以授予以下權限：</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>權限名稱</th>
+                    <th>說明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SELECT</td>
+                    <td>查詢資料</td>
+                </tr>
+                <tr>
+                    <td>INSERT</td>
+                    <td>新增資料</td>
+                </tr>
+                <tr>
+                    <td>UPDATE</td>
+                    <td>更新資料</td>
+                </tr>
+                <tr>
+                    <td>DELETE</td>
+                    <td>刪除資料</td>
+                </tr>
+                <tr>
+                    <td>EXECUTE</td>
+                    <td>執行儲存程序或函式</td>
+                </tr>
+                <tr>
+                    <td>REFERENCES</td>
+                    <td>建立外鍵參照這個物件</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>這些權限是針對「資料層」的操作，通常設定在某個特定資料表、檢視或程序上。</p>
+    </div>
+
+    <h2>2. DDL Rights（資料定義權限）</h2>
+    <div class="section">
+        <p>DDL（Data Definition Language）是用來建立或修改資料庫結構的語法。DDL Rights 就是對這些操作的授權。</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>權限名稱</th>
+                    <th>說明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>CREATE</td>
+                    <td>建立資料表、資料庫、檢視、程序等</td>
+                </tr>
+                <tr>
+                    <td>ALTER</td>
+                    <td>修改資料表結構（新增欄位、改欄位型別等）</td>
+                </tr>
+                <tr>
+                    <td>DROP</td>
+                    <td>刪除資料表、資料庫、檢視等</td>
+                </tr>
+                <tr>
+                    <td>INDEX</td>
+                    <td>建立或刪除索引</td>
+                </tr>
+                <tr>
+                    <td>CREATE VIEW</td>
+                    <td>建立檢視</td>
+                </tr>
+                <tr>
+                    <td>CREATE ROUTINE</td>
+                    <td>建立儲存程序或函式</td>
+                </tr>
+                <tr>
+                    <td>ALTER ROUTINE</td>
+                    <td>修改儲存程序或函式</td>
+                </tr>
+                <tr>
+                    <td>EVENT</td>
+                    <td>使用事件排程器</td>
+                </tr>
+                <tr>
+                    <td>TRIGGER</td>
+                    <td>建立觸發器（trigger）</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>這些權限屬於「資料庫結構層」的操作，通常會授予開發人員或管理者。</p>
+    </div>
+
+    <h2>總結對比</h2>
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>權限類型</th>
+                <th>操作層級</th>
+                <th>作用對象</th>
+                <th>常見使用者</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Object Rights</td>
+                <td>資料操作層</td>
+                <td>資料表、檢視、程序的資料內容</td>
+                <td>一般使用者、應用系統</td>
+            </tr>
+            <tr>
+                <td>DDL Rights</td>
+                <td>結構定義層</td>
+                <td>資料表、資料庫、程序的結構</td>
+                <td>DBA、開發者</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div id="content3">
+    <h1>Python: 輸入資料欄位驗證或格式處理</h1>
+    <h2>函式說明：<code>validate_data</code></h2>
+
+    <div class="section">
+        <pre><code>def validate_data(data):
+    try:
+        data["price"] = int(data["price"])   # 嘗試把 "price" 轉換為整數
+        data["area"] = float(data["area"])   # 嘗試把 "area" 轉換為浮點數
+        return True                          # 如果兩個轉換都成功，回傳 True
+    except (ValueError, TypeError):          # 如果出現數值錯誤或型別錯誤
+        return False                         # 回傳 False，表示驗證失敗
+</code></pre>
+    </div>
+
+    <div class="section">
+        <h3>實際用途：</h3>
+        <p>這段程式碼通常用於處理來自表單、API 或其他輸入來源的資料，確保這些資料在存入資料庫或進一步處理之前具有正確的數值型態。</p>
+    </div>
+
+    <div class="section">
+        <h3>範例（成功）：</h3>
+        <pre><code>data = {"price": "1000", "area": "52.5"}
+print(validate_data(data))  # 輸出: True
+print(data)  # {"price": 1000, "area": 52.5}
+</code></pre>
+    </div>
+
+    <div class="section">
+        <h3>範例（失敗）：</h3>
+        <pre><code>data = {"price": "abc", "area": "52.5"}
+print(validate_data(data))  # 輸出: False
+</code></pre>
+    </div>
+</div>

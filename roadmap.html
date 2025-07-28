@@ -1,0 +1,1586 @@
+<div id="summary">
+  <table>
+    <thead>
+      <tr>
+        <th>速查表</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="#content1">⭕ 實作地圖</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content2">⭕ 批次寫入後確認「資料是否寫入成功」方法</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content3">⭕ Python 資料匯入資料庫流程說明</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content4">⭕ Power BI 報表自動更新功能說明</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content5">⭕ Power BI 報表自動更新流程說明</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content6">⭕ Power BI 內嵌報表的方式概述</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content7">⭕ Power BI 內嵌報表與自動更新說明</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content8">⭕ Power BI 報表排程刷新設定簡要流程</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content9">⭕ Power BI 動態報表與內嵌功能完整教學文件</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content10">⭕ Power BI JavaScript API 客製化嵌入範例</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content11">⭕ Power BI 的排程刷新功能 與 內嵌報表（iframe）</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content12">⭕ Power BI 不透過微軟 API 嵌入 Power BI 報表</a></td>
+      </tr>
+      <tr>
+        <td><a href="#content13">⭕ windows工作排程</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+</div>
+<div id="content1">
+  <h1>實作地圖</h1>
+
+  <section class="section">
+    <h2>一、目標拆解與流程圖</h2>
+    <p>目標：</p>
+    <p>自動從房市網站爬蟲 → 存入 MySQL → Power BI 定期更新 → 儀表板展示趨勢與統計</p>
+
+    <p>最簡資料流流程：</p>
+    <pre>[Python爬蟲] → [MySQL資料庫] → [Power BI 資料來源連結] → [Power BI 自動排程更新] → [儀表板展示]</pre>
+    <hr>
+  </section>
+
+  <section class="section">
+    <h2> 二、最小實作步驟（MVP級）</h2>
+    <ol>
+      <li>
+        <strong>Python 爬蟲：抓房市資料</strong>
+        <p>建議網站來源：591新建案 / 中古屋，實價登錄（內政部）</p>
+        <p>爬蟲設計：</p>
+        <ul>
+          <li>抓取欄位（建議最少包含）：</li>
+        </ul>
+        <p>地區 / 地址</p>
+        <p>總價 / 單價 / 坪數</p>
+        <p>格局 / 屋齡 / 社區名</p>
+        <p>日期（登錄日或發佈日）</p>
+        <p>requests + BeautifulSoup 或 Selenium（若有 JS 渲染）</p>
+      </li>
+
+      <li>
+        <strong>將資料存進 MySQL</strong>
+        <p>設計資料表（建議命名：house_data）：</p>
+        <pre>
+CREATE TABLE house_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    area VARCHAR(100),
+    address VARCHAR(255),
+    price INT,
+    unit_price FLOAT,
+    size FLOAT,
+    layout VARCHAR(50),
+    age FLOAT,
+    posted_date DATE,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+                </pre>
+
+        <p>Python 連線 MySQL 推資料：</p>
+        <pre>
+import pymysql
+
+# 連線與 insert 範例
+conn = pymysql.connect(...)
+cursor = conn.cursor()
+sql = "INSERT INTO house_data (area, address, price, unit_price, size, layout, age, posted_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+cursor.execute(sql, (area, address, price, unit_price, size, layout, age, date))
+conn.commit()
+                </pre>
+      </li>
+
+      <li>
+        <strong>Power BI 連接 MySQL 並建儀表板</strong>
+        <p>開啟 Power BI Desktop，選擇「取得資料」 → 「MySQL 資料庫」</p>
+        <p>設定 MySQL 連線參數</p>
+        <p>使用 Power Query 建立基本轉換邏輯：</p>
+        <ul>
+          <li>移除重複資料</li>
+          <li>將 posted_date 轉為月份，作為趨勢分析用</li>
+        </ul>
+        <p>繪製：</p>
+        <ul>
+          <li>價格趨勢折線圖</li>
+          <li>地區價格熱區地圖</li>
+          <li>格局分布圓餅圖</li>
+        </ul>
+      </li>
+
+      <li>
+        <strong>自動化更新設計（依優先選擇）</strong>
+        <ul>
+          <li>最精小可行方式（本機自動化）：Python 定時排程（使用 schedule / Windows Task Scheduler / crontab）每日自動跑爬蟲 & 寫入 MySQL
+          </li>
+          <li>Power BI 自動刷新（需條件）：如果使用 Power BI Pro + 雲端資料閘道（Data Gateway），可設定每日自動更新；或透過 Power BI Service +
+            On-Premise Gateway 安裝於本機，連接 MySQL</li>
+        </ul>
+      </li>
+    </ol>
+    <hr>
+  </section>
+
+  <section class="section">
+    <h2>三、時間與資源建議</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>階段</th>
+          <th>內容</th>
+          <th>預估時間</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>第一週</td>
+          <td>Python 爬蟲撰寫與測試</td>
+          <td>2–3 天</td>
+        </tr>
+        <tr>
+          <td>第二週</td>
+          <td>MySQL 建表與串接測試</td>
+          <td>1–2 天</td>
+        </tr>
+        <tr>
+          <td>第三週</td>
+          <td>Power BI 連線與製作儀表板</td>
+          <td>2–3 天</td>
+        </tr>
+        <tr>
+          <td>第四週</td>
+          <td>自動化排程設定 + 審查成果</td>
+          <td>1–2 天</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+  </section>
+
+  <section class="section">
+    <h2>加值建議（進階後期可加入）</h2>
+    <ul>
+      <li>地圖分析（Power BI 的地圖視覺化）</li>
+      <li>推估行情（可結合簡單機器學習模型）</li>
+      <li>房型關聯分析</li>
+      <li>動態 URL 搜尋參數設計（針對不同地區）</li>
+    </ul>
+    <hr>
+  </section>
+</div>
+<div id="content2">
+  <h1>批次寫入後確認「資料是否寫入成功」方法</h1>
+  <section>
+
+    <p>批次寫入後確認「資料是否寫入成功」是很關鍵的一步。以下是實務上常用的方法，依你使用的資料庫與寫入工具略有不同，但整體邏輯都相通。</p>
+
+    <h2>常見方式一：檢查資料庫回傳的結果 or 例外錯誤</h2>
+    <p>使用 <code>executemany()</code> 時，若寫入成功，通常：</p>
+    <ul>
+      <li>不會丟出例外；</li>
+      <li>你可以查看 <code>cursor.rowcount</code> 表示受影響的筆數。</li>
+    </ul>
+    <p>SQLite / MySQL 範例：</p>
+    <pre>
+cursor.executemany("INSERT INTO users (name, age) VALUES (?, ?)", data_batch)
+
+print(f"{cursor.rowcount} rows inserted.")  # 應該等於 len(data_batch)
+conn.commit()
+    </pre>
+    <p>若 <code>rowcount</code> 小於預期，代表有筆數可能沒成功寫入。</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>常見方式二：查詢資料是否已存在</h2>
+    <p>用主鍵、唯一值等條件來確認資料真的進入資料庫，例如：</p>
+    <pre>
+cursor.execute("SELECT COUNT(*) FROM users WHERE name IN ('Alice', 'Bob', 'Charlie')")
+count = cursor.fetchone()[0]
+print(f"確認寫入成功筆數: {count}")
+        </pre>
+    <hr>
+  </section>
+
+
+  <section>
+    <h2 id="start1">常見方式三：使用交易（transaction）機制保障一致性</h2>
+    <p>Python DB 操作基本都支援交易：</p>
+    <pre>
+try:
+cursor.executemany(sql, data_batch)
+conn.commit()  # 一次提交，沒錯才寫入
+except Exception as e:
+conn.rollback()  # 發生錯誤全部回復
+print("寫入失敗，已回復:", e)
+        </pre>
+    <p>這樣能保證「要嘛全部成功、要嘛全部失敗」，防止寫一半的狀況。</p>
+    <hr>
+  </section>
+
+
+  <section>
+    <h2>常見方式四：寫入後讀回確認（對重要資料）</h2>
+    <p>如果寫入的是重要資料，除了檢查筆數外，也可以「讀出剛寫入的內容」來做驗證，例如：</p>
+    <pre>
+cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 3")
+for row in cursor.fetchall():
+print(row)
+        </pre>
+    <hr>
+  </section>
+
+
+  <section>
+    <h2>若使用 pandas.to_sql()，如何確認？</h2>
+    <pre>
+df.to_sql('users', con=engine, if_exists='append', index=False)
+
+# 寫入後再次查詢行數或特定值
+with engine.connect() as conn:
+result = conn.execute("SELECT COUNT(*) FROM users")
+print(f"Total rows: {result.scalar()}")
+        </pre>
+    <hr>
+  </section>
+
+
+  <section>
+    <h2>補充：寫入日誌 / Log 是好習慣</h2>
+    <p>你可以在每次批次寫入時記錄：</p>
+    <pre>
+print(f"[{datetime.now()}] 寫入 {len(batch)} 筆資料成功")
+        </pre>
+    <p>或寫入一個 log 檔案中，方便日後追蹤。</p>
+    <hr>
+  </section>
+
+
+  <section>
+    <h2>小結 — 如何確認批次寫入成功？</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>方法</th>
+          <th>說明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>cursor.rowcount</code></td>
+          <td>查看成功影響筆數</td>
+        </tr>
+        <tr>
+          <td>查詢寫入結果</td>
+          <td>用 SELECT 驗證是否真的寫入</td>
+        </tr>
+        <tr>
+          <td>try/except + commit</td>
+          <td>發生錯誤就 rollback，保證一致性</td>
+        </tr>
+        <tr>
+          <td>交易控制（transaction）</td>
+          <td>確保批次寫入的原子性</td>
+        </tr>
+        <tr>
+          <td>日誌或 log 紀錄</td>
+          <td>保留紀錄，方便除錯</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+  </section>
+</div>
+<div id="content3">
+  <h1>Python 資料匯入流程說明</h1>
+
+  <section>
+    <h2>功能總覽</h2>
+    <ul>
+      <li><strong>資料庫初始化</strong></li>
+      <ul>
+        <li>連接 MySQL 資料庫（設定在 <code>db_config</code>）</li>
+        <li>建立 <code>housing</code> 表格（如果尚未存在），欄位有
+          <code>id</code>、<code>address</code>、<code>price</code>、<code>area</code>
+        </li>
+      </ul>
+      <li><strong>CSV 檔案備份</strong></li>
+      <ul>
+        <li>每收到一筆新資料，就寫入本地 CSV (<code>housing_data.csv</code>) 作為備份</li>
+      </ul>
+      <li><strong>資料緩衝區與批次寫入 MySQL</strong></li>
+      <ul>
+        <li>使用 buffer 來暫存新資料</li>
+        <li>當 buffer 中資料達到 <code>BUFFER_LIMIT</code>（100 筆）時，批次寫入 MySQL，提高寫入效率</li>
+        <li>程式結束前會把剩下不足 100 筆的資料也寫入資料庫，避免遺漏</li>
+      </ul>
+      <li><strong>資料驗證</strong></li>
+      <ul>
+        <li>對資料中的 <code>price</code> 和 <code>area</code> 進行型態轉換與驗證，避免寫入錯誤格式</li>
+      </ul>
+      <li><strong>錯誤與狀態紀錄</strong></li>
+      <ul>
+        <li>透過 <code>logging</code> 模組寫入 <code>import_log.log</code>，記錄成功寫入與失敗回滾等事件</li>
+        <li>寫入失敗會印出錯誤訊息並執行資料庫回滾，確保資料完整性</li>
+      </ul>
+      <li><strong>模擬資料</strong></li>
+      <ul>
+        <li>主程式模擬 150 筆資料，產生地點、價格和面積</li>
+        <li>範例資料可替換成爬蟲或其他資料來源</li>
+      </ul>
+    </ul>
+  </section>
+
+  <section>
+    <h2>執行流程簡述</h2>
+    <ol>
+      <li>呼叫 <code>init_db()</code> 確保資料表存在</li>
+      <li>透過迴圈產生假資料</li>
+      <li>用 <code>validate_data()</code> 驗證資料格式</li>
+      <li>符合格式就呼叫 <code>process_new_data()</code>：
+        <ul>
+          <li>寫入 CSV</li>
+          <li>新資料加到緩衝區</li>
+          <li>緩衝區滿時寫入 MySQL</li>
+        </ul>
+      </li>
+      <li>迴圈結束後，把緩衝區中剩餘的資料寫入 MySQL</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>適用場景</h2>
+    <ul>
+      <li>需要大量資料批次匯入 MySQL，並且希望有本地 CSV 備份</li>
+      <li>簡易錯誤處理與日誌紀錄</li>
+      <li>適合用於爬蟲資料後續儲存或批量資料匯入流程</li>
+    </ul>
+  </section>
+  <pre><code class="language-python">
+import csv
+import os
+import mysql.connector
+from mysql.connector import Error
+import logging
+
+# logging 日誌系統設定
+logging.basicConfig(
+    filename="import_log.log",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)   
+
+# MySQL 資料庫連線設定
+db_config = {
+    "host":"127.0.0.1",
+    "user":"dbuser2",
+    "password":"1234",
+    "autocommit":True,  # 自動提交事務
+    "port":3306,  # 如果需要指定端口
+    "charset":'utf8mb4',  # 如果需要指定字符集
+    "database":"housing"
+}
+
+# CSV 設定
+csv_file = "housing_data.csv"
+buffer = []
+BUFFER_LIMIT = 100
+
+# 建立表格（若不存在）
+def init_db(): 
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS housing (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                address VARCHAR(255),
+                price INT,
+                area FLOAT
+            )
+        ''')
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Error as e:
+        print("❌ 初始化資料庫失敗：", e)
+        logging.info("❌ 初始化資料庫失敗") 
+
+# 寫入 CSV（單筆）
+def write_to_csv(data, file_path):
+    file_exists = os.path.isfile(file_path)
+    with open(file_path, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=["address", "price", "area"])
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(data)
+
+def write_to_mysql_transaction(data_batch):
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        conn.start_transaction()
+
+        params = [(item["address"], item["price"], item["area"]) for item in data_batch]
+        cursor.executemany(
+            "INSERT INTO housing (address, price, area) VALUES (%s, %s, %s)",
+            params
+        )
+
+        conn.commit()
+        print(f"✅ 成功寫入 {len(data_batch)} 筆資料")
+        logging.info("✅ 成功寫入資料")     
+    except Error as e:
+        conn.rollback()
+        print("❌ 資料寫入失敗，已回滾")
+        logging.info("❌ 資料寫入失敗，已回滾")     
+        print("錯誤：", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# 新資料進來時的處理邏輯
+def process_new_data(new_data):
+    write_to_csv(new_data, csv_file)
+    buffer.append(new_data)
+    if len(buffer) >= BUFFER_LIMIT:
+        write_to_mysql_transaction(buffer.copy())
+        buffer.clear()
+
+# 增加欄位驗證或格式處理
+def validate_data(data):
+    try:
+        data["price"] = int(data["price"])
+        data["area"] = float(data["area"])
+        return True
+    except (ValueError, TypeError):
+        return False
+
+if __name__ == '__main__':
+    # 初始化資料表
+    init_db()
+
+    # 模擬資料進來（可替換成實際爬蟲）
+    for i in range(150):  # 假設有 250 筆資料
+        mock_data = {
+            "address": f"台北市大安區仁愛路{i}號",
+            "price": 1000 + i * 5,
+            "area": 30 + (i % 10)
+        }
+        if validate_data(mock_data):
+            process_new_data(mock_data)
+        else:
+            print("⚠️ 無效資料，略過：", mock_data)
+
+    if buffer:
+        write_to_mysql_transaction(buffer.copy())
+        buffer.clear()
+</code></pre>
+</div>
+<div id="content4">
+  <h1>Power BI 報表自動更新功能說明</h1>
+  <h2>Power BI 報表自動更新功能說明</h2>
+  <p>Power BI 報表可以實現動態更新（即資料自動刷新），這是 Power BI 強大的功能之一。這個動態更新的實現主要依靠「資料來源的連線方式」與「Power BI Service 中的排程重新整理設定」。</p>
+
+  <h3>Power BI 動態更新基本原理：</h3>
+  <p>報表中的資料來自「資料集（Dataset）」，而這些資料集可以設定自動重新整理排程。當資料來源有變動時，報表也會隨之更新。</p>
+
+  <h3>更新方式分為兩種：</h3>
+  <ul>
+    <li>
+      <strong>1. 匯入模式（Import Mode）</strong><br>
+      資料會匯入至 Power BI 中（例如 Excel、SQL Server）。<br>
+      必須透過「重新整理」動作，資料才會更新。<br>
+      適用於中小型資料或不需即時更新的場景。
+    </li>
+    <li>
+      <strong>2. DirectQuery / Live Connection 模式</strong><br>
+      報表不儲存資料，而是每次查詢時即時連線資料來源（如 Azure SQL、Analysis Services）。<br>
+      適用於需要即時或近即時資料的應用，但對效能要求較高。
+    </li>
+  </ul>
+
+  <h3>設定動態更新（排程重新整理）的程序：</h3>
+  <h4>前提條件</h4>
+  <ul>
+    <li>您使用的是 Power BI Pro 或 Power BI Premium。</li>
+    <li>資料來源需支援重新整理。</li>
+    <li>若為內部來源（如本地 SQL Server），需透過閘道器（On-premises data gateway）。</li>
+  </ul>
+
+  <h4>排程重新整理設定步驟：</h4>
+  <ol>
+    <li>登入 Power BI Service（<a href="https://app.powerbi.com" target="_blank">https://app.powerbi.com</a>）。</li>
+    <li>進入您的工作區，找到資料集（Dataset）。</li>
+    <li>點選資料集右側「更多選項（...）」→ 選擇「設定（Settings）」。</li>
+    <li>在「排程重新整理（Scheduled refresh）」區域：
+      <ul>
+        <li>啟用排程。</li>
+        <li>設定每日重新整理的時間（最多 8 次/天，Premium 可達 48 次）。</li>
+        <li>（可選）設定失敗時發送通知。</li>
+        <li>如資料來源需閘道器，請確認您已安裝並註冊 On-premises Gateway，並將資料來源正確綁定在閘道器中。</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h3>常見支援的資料來源包括：</h3>
+  <ul>
+    <li>SQL Server / Azure SQL</li>
+    <li>Excel（在 OneDrive 或 SharePoint 上）</li>
+    <li>SharePoint List</li>
+    <li>Web API / REST API</li>
+    <li>Oracle、MySQL、PostgreSQL 等（需閘道器）</li>
+  </ul>
+
+  <h3>範例說明：</h3>
+  <p>假如您從 SQL Server 取得資料：</p>
+  <ul>
+    <li>您需在公司電腦或伺服器上安裝 Power BI Gateway。</li>
+    <li>在 Power BI Service 設定連線與排程，每天早上 8:00 自動拉新資料。</li>
+    <li>報表打開時就是最新的，不需手動重新發布。</li>
+  </ul>
+</div>
+<div id="content5">
+  <h1>Power BI 報表自動更新流程說明</h1>
+
+  <h2>流程概述：</h2>
+  <table>
+    <tr>
+      <th>項目</th>
+      <th>描述</th>
+    </tr>
+    <tr>
+      <td>資料來源</td>
+      <td>MySQL（自行爬蟲寫入）</td>
+    </tr>
+    <tr>
+      <td>更新時間</td>
+      <td>每天早上 9:00</td>
+    </tr>
+    <tr>
+      <td>報表需求</td>
+      <td>自動更新 Power BI 報表資料</td>
+    </tr>
+    <tr>
+      <td>目標</td>
+      <td>使用者打開報表就看到每天最新資料</td>
+    </tr>
+  </table>
+  <br>
+
+  <h2>解決方案：Power BI + On-premises Data Gateway + 排程重新整理</h2>
+
+  <div class="step">
+    <h3>步驟一：在 Power BI Desktop 連接 MySQL</h3>
+    <ul>
+      <li>開啟 Power BI Desktop。</li>
+      <li>點選「取得資料」→「MySQL 數據庫」。</li>
+      <li>輸入：
+        <ul>
+          <li>伺服器名稱（IP 或 DNS 名稱）</li>
+          <li>資料庫名稱（Database Name）</li>
+          <li>驗證資訊（使用者名稱與密碼）</li>
+        </ul>
+      </li>
+      <li>選取所需的表格或用 SQL 查詢選取資料。</li>
+      <li>建立圖表與報表後，儲存檔案（.pbix）。</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h3>步驟二：安裝 Power BI Gateway（若資料庫在本機或內網）</h3>
+    <ul>
+      <li>到 Power BI Gateway 下載頁。</li>
+      <li>安裝「個人模式」或「標準模式」（建議使用標準模式，可多人共用）。</li>
+      <li>登入您的 Power BI 帳號並註冊 Gateway。</li>
+      <li>完成後，到 Power BI Service 綁定此 Gateway 和資料來源。</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h3>步驟三：發佈報表到 Power BI Service</h3>
+    <ul>
+      <li>在 Power BI Desktop 點選「發布」。</li>
+      <li>選擇工作區（My workspace 或企業工作區）。</li>
+      <li>成功後，報表與資料集會上傳到 Power BI Service。</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h3>步驟四：設定「資料來源」與「排程重新整理」</h3>
+    <ul>
+      <li>登入 Power BI（https://app.powerbi.com）。</li>
+      <li>進入您發佈的報表所在的工作區。</li>
+      <li>點選左側「資料集」→ 找到資料集 → 點選「設定」。</li>
+      <li>在「資料來源認證」設定連線 MySQL 的帳密，並選擇 Gateway（如有）。</li>
+      <li>在「排程重新整理」：
+        <ul>
+          <li>啟用排程。</li>
+          <li>設定每天 9:30 自動更新（建議稍晚於爬蟲執行時間）。</li>
+          <li>可設定通知信箱，以便失敗時提醒。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <h2>注意事項</h2>
+  <table>
+    <tr>
+      <th>注意事項</th>
+      <th>建議</th>
+    </tr>
+    <tr>
+      <td>Gateway 狀態</td>
+      <td>必須保持啟動狀態，建議部署於伺服器或持續開機的設備</td>
+    </tr>
+    <tr>
+      <td>MySQL 資安設定</td>
+      <td>若需對外存取，請確保有安全控管（IP 白名單、VPN）</td>
+    </tr>
+    <tr>
+      <td>多人共用報表</td>
+      <td>可將報表發佈至 App 或指定分享給其他帳號</td>
+    </tr>
+  </table>
+  <br>
+
+  <h2>流程圖示</h2>
+  <pre class="flow">
+[每天 9:00 爬蟲] → [寫入 MySQL 資料庫]
+        ↓
+[Power BI Gateway（本機連線）]
+        ↓
+[Power BI Service] ← [排程每日 9:30 刷新資料集]
+        ↓
+[使用者打開報表 → 自動是最新資料]
+    </pre>
+</div>
+<div id="content6">
+  <h1>Power BI 內嵌報表的方式概述</h1>
+
+  <section>
+    <h2>1. 發佈到 Web（Publish to Web）— 公開展示</h2>
+    <p><strong>用途：</strong>快速將報表嵌入到任何網站（如部落格、公司網頁）。</p>
+    <p><strong>適合對象：</strong>公開資料，任何人都可瀏覽。</p>
+    <p><strong>優點：</strong>簡單、免費、快速。</p>
+    <p><strong>限制：</strong></p>
+    <ul>
+      <li>報表將公開，不適用於敏感或內部資料。</li>
+      <li>不支援 DirectQuery / RLS（列級安全性）。</li>
+      <li>只有擁有 Power BI Pro 的用戶可發佈。</li>
+    </ul>
+
+    <p><strong>使用步驟：</strong></p>
+    <ol>
+      <li>在 Power BI Service 開啟報表。</li>
+      <li>點選「檔案」→「發佈到網頁」。</li>
+      <li>取得一段 &lt;iframe&gt; HTML 代碼。</li>
+      <li>將此代碼貼入您的網站 HTML 中，即可嵌入報表。</li>
+    </ol>
+
+    <pre>&lt;iframe width="800" height="600" 
+src="https://app.powerbi.com/view?r=XXXXXXX" 
+frameborder="0" allowFullScreen="true"&gt;&lt;/iframe&gt;</pre>
+
+    <hr>
+  </section>
+
+  <section>
+    <h2>2. 嵌入到內部應用程式或網站中（Embed for your organization）</h2>
+    <p><strong>用途：</strong>將報表嵌入內部系統（如 Intranet、SharePoint Online）。</p>
+    <p><strong>適合對象：</strong>企業內部使用者，需登入並有授權。</p>
+    <p><strong>優點：</strong></p>
+    <ul>
+      <li>支援安全驗證、使用者權限控管。</li>
+      <li>適用於敏感或內部資料。</li>
+    </ul>
+    <p><strong>限制：</strong></p>
+    <ul>
+      <li>所有使用者需要 Power BI Pro 授權。</li>
+      <li>僅限組織成員（Azure AD 使用者）瀏覽。</li>
+    </ul>
+
+    <hr>
+  </section>
+
+  <section>
+    <h2>3. 使用 Power BI JavaScript API（Embed for customers）— 客製化應用</h2>
+    <p><strong>用途：</strong>開發自定義網站或應用程式，內嵌互動式報表。</p>
+    <p><strong>適合對象：</strong>開發者 / SaaS 應用，向外部客戶展示資料。</p>
+    <p><strong>優點：</strong></p>
+    <ul>
+      <li>客製化程度高（可控制頁籤、篩選器、互動功能等）。</li>
+      <li>可搭配 Row Level Security（RLS）做到資料隔離。</li>
+    </ul>
+
+    <p><strong>授權需求：</strong></p>
+    <ul>
+      <li>需使用 Power BI Embedded（在 Azure 訂閱中開通容量）。</li>
+      <li>不需客戶有 Power BI 帳號。</li>
+    </ul>
+
+    <p><strong>技術關鍵：</strong></p>
+    <ul>
+      <li>使用 Power BI REST API 搭配 JavaScript SDK。</li>
+      <li>搭配 Azure AD 做身份驗證與存取控制。</li>
+      <li>嵌入報表時提供 accessToken 和報表資訊。</li>
+    </ul>
+
+    <hr>
+  </section>
+
+  <section>
+    <h2>總結比較：</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>嵌入方式</th>
+          <th>安全性</th>
+          <th>授權需求</th>
+          <th>適用情境</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>發佈到 Web</td>
+          <td>無保護</td>
+          <td>Power BI Pro</td>
+          <td>公開報表（非敏感資料）</td>
+        </tr>
+        <tr>
+          <td>嵌入給組織內部用戶</td>
+          <td>高</td>
+          <td>Power BI Pro</td>
+          <td>內部網站、內部系統</td>
+        </tr>
+        <tr>
+          <td>JavaScript API 嵌入</td>
+          <td>高（可控）</td>
+          <td>Power BI Embedded / Azure</td>
+          <td>客戶應用、自定系統或 SaaS 平台</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br>
+  </section>
+</div>
+<div id="content7">
+  <h1>Power BI內嵌報表與動態報表的關聯</h1>
+  <section>
+    <h2>1. 內嵌報表與動態報表的關聯</h2>
+    <p>動態報表（資料自動更新）是指 Power BI 報表背後的「資料集（Dataset）」會定時從資料來源拉取最新資料，透過「排程重新整理」或 DirectQuery 即時查詢，確保報表內容是最新的。</p>
+    <p>內嵌報表則是將 Power BI 報表以 iframe 或 API 方式嵌入外部網頁或應用程式，讓使用者能在網頁中看到該報表並與之互動。</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>2. 內嵌報表是否會自動顯示最新資料？</h2>
+    <p>會的。內嵌報表實際就是 Power BI 服務上的報表，只要報表底下的資料集有設定排程重新整理，或者使用 DirectQuery 模式即時查詢，使用者在網頁中看到的報表內容就是最新的。</p>
+    <p>使用者每次重新載入網頁或報表畫面時，報表會從 Power BI 服務載入最新資料。</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>3. 注意事項</h2>
+    <ul>
+      <li>若是匯入模式（Import Mode）資料集，必須確保資料集有定時排程重新整理，否則內嵌報表仍會呈現舊資料。</li>
+      <li>若使用 DirectQuery 或 Live Connection，資料查詢會即時連到資料來源，內嵌報表自然會呈現最新資料。</li>
+      <li>在「發佈到網頁」方式內嵌時，報表資料刷新頻率和 Power BI Service 的刷新設定相關，刷新間隔和頻率會影響報表的即時性。</li>
+    </ul>
+    <hr>
+  </section>
+  <section>
+    <h2>小結</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th>功能</th>
+          <th>作用與關係</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>動態報表</td>
+          <td>確保資料集定期更新或即時查詢，報表資料保持最新</td>
+        </tr>
+        <tr>
+          <td>內嵌報表</td>
+          <td>將報表顯示在網頁中，畫面即時呈現 Power BI 服務上的最新報表</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>兩者配合，才能讓外部使用者在嵌入頁面看到「動態更新」的最新資料視覺化。</p>
+    <hr>
+  </section>
+</div>
+<div id="content8">
+  <h1>Power BI 報表排程刷新設定簡要流程</h1>
+  <section>
+    <h2>一、Power BI 報表排程刷新設定簡要流程</h2>
+    <ol>
+      <li>登入 Power BI Service（https://app.powerbi.com）</li>
+      <li>進入工作區 → 找到對應的資料集（Dataset）</li>
+      <li>點選右側「...」 → 選「設定（Settings）」</li>
+      <li>在「排程重新整理（Scheduled refresh）」啟用排程</li>
+      <li>設定刷新頻率（例如每天 8:00）</li>
+      <li>若資料來源是本地端，請確認已安裝並配置好 On-premises Data Gateway</li>
+      <li>驗證刷新是否成功
+        <ul>
+          <li>手動執行一次刷新測試</li>
+          <li>查看最近刷新歷史記錄，確認無錯誤</li>
+        </ul>
+      </li>
+    </ol>
+    <hr>
+  </section>
+
+  <section>
+    <h2>二、取得內嵌報表的程式碼（Publish to Web 範例）</h2>
+    <p><strong>注意：</strong>此方法會公開報表，請勿用於敏感資料！</p>
+    <ol>
+      <li>在 Power BI Service 打開報表</li>
+      <li>點「檔案」→「發佈到網頁（Publish to web）」</li>
+      <li>建立並複製 &lt;iframe&gt; 嵌入代碼</li>
+    </ol>
+    <p>範例：</p>
+    <pre>
+&lt;iframe width="800" height="600" 
+    src="https://app.powerbi.com/view?r=YOUR_REPORT_ID" 
+    frameborder="0" allowFullScreen="true"&gt;&lt;/iframe&gt;
+  </pre>
+    <hr>
+  </section>
+
+  <section>
+    <h2>三、整合說明</h2>
+    <p>您設定好資料集的排程刷新後，Power BI 服務會定期自動更新資料。</p>
+    <p>內嵌的報表 iframe 每次載入都會讀取 Power BI 服務上的最新報表內容。</p>
+    <p>因此，當排程刷新完成後，網頁上的報表會顯示最新資料。</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>四、進階：用 Power BI JavaScript API 內嵌（安全內嵌示意）</h2>
+    <p>如果要將報表嵌入企業內部網站且需身份驗證，會用到 JavaScript API。範例大致長這樣（需搭配 Access Token 與報表ID）：</p>
+    <pre>
+&lt;div id="reportContainer" style="height:600px;"&gt;&lt;/div&gt;
+
+&lt;script src="https://cdn.powerbi.com/libs/powerbi-client/2.19.0/powerbi.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  // 這些參數通常由後端產生並傳入
+  const embedConfig = {
+    type: 'report',
+    id: 'YOUR_REPORT_ID',
+    embedUrl: 'YOUR_EMBED_URL',
+    accessToken: 'YOUR_ACCESS_TOKEN',
+    tokenType: window['powerbi-client'].models.TokenType.Embed,
+    settings: {
+      filterPaneEnabled: false,
+      navContentPaneEnabled: true
+    }
+  };
+
+  const reportContainer = document.getElementById('reportContainer');
+  const report = powerbi.embed(reportContainer, embedConfig);
+
+  // 也可以用 API 控制互動，如重新整理
+  // report.refresh();
+&lt;/script&gt;
+  </pre>
+    <p>以上方式需搭配 Power BI Embedded 及 Azure AD 認證。</p>
+    <hr>
+  </section>
+
+</div>
+<div id="content9">
+  <h1>Power BI 動態報表與內嵌功能完整教學文件</h1>
+  <section>
+    <h2>目錄</h2>
+    <ol>
+      <li><a href="#section1">Power BI 動態報表資料更新原理</a></li>
+      <li><a href="#section2">Power BI 排程刷新設定流程</a></li>
+      <li><a href="#section3">Power BI 報表內嵌方式介紹</a></li>
+      <li><a href="#section4">動態報表與內嵌報表的關聯說明</a></li>
+      <li><a href="#section5">常見問題與注意事項</a></li>
+      <li><a href="#section6">附錄：範例內嵌 iframe 程式碼</a></li>
+    </ol>
+    <hr>
+  </section>
+
+  <section id="section1">
+    <h2>1. Power BI 動態報表資料更新原理</h2>
+    <p>Power BI 報表所呈現的資料來自於「資料集（Dataset）」。資料集可設定為：</p>
+    <ul>
+      <li><strong>匯入模式（Import Mode）</strong><br>將資料匯入 Power BI 儲存，需透過排程刷新才能更新資料。</li>
+      <li><strong>DirectQuery / Live Connection</strong><br>即時查詢資料來源，不儲存資料，資料變動即時反映。</li>
+    </ul>
+    <p>透過 Power BI Service 中設定「排程重新整理（Scheduled refresh）」，資料集會定期自動從資料來源更新，確保報表資料最新。</p>
+    <hr>
+  </section>
+
+  <section id="section2">
+    <h2>2. Power BI 排程刷新設定流程</h2>
+    <h3>前提</h3>
+    <ul>
+      <li>擁有 Power BI Pro 或 Power BI Premium 授權</li>
+      <li>資料來源支援刷新，內部資料庫需安裝並設定 On-premises Data Gateway</li>
+    </ul>
+    <h3>設定步驟</h3>
+    <ol>
+      <li>登入 Power BI Service（https://app.powerbi.com）</li>
+      <li>進入您的工作區（Workspace）</li>
+      <li>找到要設定的資料集（Dataset）</li>
+      <li>點選資料集右側「更多選項（...）」 → 「設定（Settings）」</li>
+      <li>滾動到「排程重新整理（Scheduled refresh）」區域</li>
+      <li>開啟排程刷新，設定刷新頻率與時間（最多每天 8 次，Premium 可達 48 次）</li>
+      <li>（如適用）確認已安裝並設定 On-premises Data Gateway，並綁定資料來源</li>
+      <li>按「套用（Apply）」</li>
+    </ol>
+    <h3>驗證刷新</h3>
+    <ul>
+      <li>可按「立即重新整理（Refresh now）」測試</li>
+      <li>查看刷新歷史記錄確認是否成功</li>
+    </ul>
+    <hr>
+  </section>
+
+  <section id="section3">
+    <h2>3. Power BI 報表內嵌方式介紹</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th>方式</th>
+          <th>說明</th>
+          <th>適用場景</th>
+          <th>授權需求</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>發佈到 Web (Publish to web)</td>
+          <td>公開報表以 iframe 形式嵌入網頁</td>
+          <td>公開分享、不含敏感資料的報表</td>
+          <td>Power BI Pro</td>
+        </tr>
+        <tr>
+          <td>Embed for your organization</td>
+          <td>內部用戶安全登入後嵌入報表</td>
+          <td>企業內部網站或系統</td>
+          <td>Power BI Pro</td>
+        </tr>
+        <tr>
+          <td>Power BI Embedded (JavaScript API)</td>
+          <td>自訂開發使用，支援權限與 RLS</td>
+          <td>SaaS 或客戶應用</td>
+          <td>Power BI Embedded / Azure 訂閱</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>發佈到 Web 內嵌步驟（範例）</h3>
+    <ol>
+      <li>打開報表 → 「檔案」 → 「發佈到網頁」</li>
+      <li>取得 iframe 代碼</li>
+      <li>貼入網站 HTML</li>
+    </ol>
+    <hr>
+  </section>
+
+  <section id="section4">
+    <h2>4. 動態報表與內嵌報表的關聯說明</h2>
+    <ul>
+      <li>動態報表透過排程刷新或 DirectQuery 確保資料最新</li>
+      <li>內嵌報表載入時會從 Power BI 服務拉取最新的報表資料</li>
+      <li>兩者結合可讓外部使用者在嵌入頁面看到及時更新的資料視覺化</li>
+      <li>若報表資料未刷新，內嵌頁面仍會呈現舊資料</li>
+    </ul>
+    <hr>
+  </section>
+
+  <section id="section5">
+    <h2>5. 常見問題與注意事項</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th>問題</th>
+          <th>解決建議</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>內嵌報表資料沒更新</td>
+          <td>確認資料集有正確設定排程刷新並成功執行</td>
+        </tr>
+        <tr>
+          <td>資料來源是內部資料庫，無法刷新</td>
+          <td>確認 On-premises Data Gateway 已安裝、設定並正常運作</td>
+        </tr>
+        <tr>
+          <td>報表被外部使用者無法看到</td>
+          <td>確認權限設定，發佈到 Web 報表需公開，安全內嵌需登入權限</td>
+        </tr>
+        <tr>
+          <td>需要更高刷新頻率</td>
+          <td>升級至 Power BI Premium，可設置更多刷新次數</td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+  </section>
+
+  <section id="section6">
+    <h2>6. 附錄：範例內嵌 iframe 程式碼</h2>
+    <p><!-- 基本發佈到網頁方式內嵌報表 --></p>
+    <pre>
+&lt;iframe width="800" height="600" 
+    src="https://app.powerbi.com/view?r=YOUR_REPORT_ID" 
+    frameborder="0" allowFullScreen="true"&gt;&lt;/iframe&gt;
+  </pre>
+    <hr>
+  </section>
+
+  <section>
+    <h2>結語</h2>
+    <p>透過 Power BI 排程刷新確保資料持續更新，搭配報表內嵌功能，您可以將動態報表無縫整合到公司內網、客戶系統或公開網站，讓使用者即時掌握最新資訊。</p>
+    <p>如果需要進一步客製化內嵌程式碼（例如使用 JavaScript API 或搭配權限控管），歡迎提出，我可以協助提供範例與指引。</p>
+    <hr>
+  </section>
+
+</div>
+<div id="content10">
+  <h1>Power BI JavaScript API 客製化嵌入範例</h1>
+  <section>
+    <h2>適用情境</h2>
+    <ul>
+      <li>報表嵌入於內部或客戶平台，並需要權限保護</li>
+      <li>使用者不需登入 Power BI，但可看到專屬資料（RLS）</li>
+      <li>可自訂報表顯示模式、控制功能開關、傳入篩選條件等</li>
+    </ul>
+    <hr>
+  </section>
+
+  <section>
+    <h2>前置需求</h2>
+    <ul>
+      <li>Azure AD 應用註冊（用於產 Access Token）</li>
+      <li>有 Power BI Pro 或 Power BI Embedded（A SKUs）授權</li>
+      <li>使用 REST API 取得：
+        <ul>
+          <li>報表 ID (reportId)</li>
+          <li>工作區 ID (groupId)</li>
+          <li>Embed URL</li>
+          <li>Access Token（使用後端產生）</li>
+        </ul>
+      </li>
+    </ul>
+    <hr>
+  </section>
+
+  <section>
+    <h2>1. HTML 結構</h2>
+    <pre>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-Hant"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Power BI 內嵌報表&lt;/title&gt;
+  &lt;script src="https://cdn.powerbi.com/libs/powerbi-client/2.21.0/powerbi.min.js"&gt;&lt;/script&gt;
+  &lt;style&gt;
+    #reportContainer {
+      width: 100%;
+      height: 800px;
+      border: 1px solid #ccc;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h2&gt;內嵌的動態報表（使用 JavaScript API）&lt;/h2&gt;
+  &lt;div id="reportContainer"&gt;&lt;/div&gt;
+
+  &lt;script&gt;
+    const embedConfig = {
+      type: 'report',
+      tokenType: powerbi.models.TokenType.Embed,
+      accessToken: 'YOUR_ACCESS_TOKEN_HERE',
+      embedUrl: 'https://app.powerbi.com/reportEmbed?reportId=YOUR_REPORT_ID&amp;groupId=YOUR_GROUP_ID',
+      id: 'YOUR_REPORT_ID',
+      settings: {
+        navContentPaneEnabled: true,
+        filterPaneEnabled: false,
+        background: powerbi.models.BackgroundType.Transparent
+      }
+    };
+
+    const reportContainer = document.getElementById('reportContainer');
+    const report = powerbi.embed(reportContainer, embedConfig);
+
+    report.on('loaded', function() {
+      console.log('報表已載入');
+    });
+
+    // report.refresh();
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+  </pre>
+    <hr>
+  </section>
+
+  <section>
+    <h2>2. Access Token 從哪裡來？</h2>
+    <p>你需要從後端伺服器（例如用 Node.js、.NET、Python）向 Power BI REST API 請求 access token。</p>
+    <p>典型流程如下：</p>
+    <ol>
+      <li>從 Azure AD 使用 client credentials flow 登入</li>
+      <li>呼叫 Power BI REST API <code>/GenerateToken</code></li>
+      <li>將 access token 回傳給前端用來嵌入報表</li>
+    </ol>
+    <hr>
+  </section>
+
+  <section>
+    <h2>3. 可客製化控制項</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th>功能</th>
+          <th>寫法範例</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>隱藏篩選器面板</td>
+          <td><code>filterPaneEnabled: false</code></td>
+        </tr>
+        <tr>
+          <td>隱藏左側頁籤</td>
+          <td><code>navContentPaneEnabled: false</code></td>
+        </tr>
+        <tr>
+          <td>手動刷新報表</td>
+          <td><code>report.refresh()</code></td>
+        </tr>
+        <tr>
+          <td>設定預設頁籤</td>
+          <td><code>report.setPage("ReportSection2")</code></td>
+        </tr>
+        <tr>
+          <td>傳入參數或篩選器</td>
+          <td><code>report.setFilters([...])</code></td>
+        </tr>
+        <tr>
+          <td>聆聽事件</td>
+          <td><code>report.on('loaded', () => {})</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+  </section>
+
+  <section>
+    <h2>4. 小結</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>說明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>安全性高</td>
+          <td>僅授權使用者可查看資料，可搭配 RLS 權限控管</td>
+        </tr>
+        <tr>
+          <td>客製化高</td>
+          <td>可控制報表行為與外觀</td>
+        </tr>
+        <tr>
+          <td>可與系統整合</td>
+          <td>可嵌入 CRM、內部入口網站、SaaS 應用等</td>
+        </tr>
+        <tr>
+          <td>需後端支援</td>
+          <td>Access Token 需後端生成</td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+  </section>
+
+
+</div>
+<div id="content11">
+  <h1>Power BI 的排程刷新功能 與 內嵌報表（iframe）</h1>
+  <section>
+    <h2>目標</h2>
+    <p>將 Power BI 報表設定為每天自動更新，並嵌入至網站頁面中，讓使用者總是看到最新資料。</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>一、資料處理與上傳（僅需做一次）</h2>
+    <ol>
+      <li>準備報表資料來源
+        <ul>
+          <li>例如：Excel、SQL Server、Azure SQL、SharePoint List...</li>
+        </ul>
+      </li>
+      <li>在 Power BI Desktop 建立報表
+        <ul>
+          <li>匯入資料 → 製作視覺化 → 儲存為 .pbix 檔案</li>
+        </ul>
+      </li>
+      <li>發佈報表至 Power BI Service
+        <ul>
+          <li>在 Power BI Desktop 中點選「發佈」→ 選擇工作區 → 成功上傳報表</li>
+        </ul>
+      </li>
+    </ol>
+    <hr>
+  </section>
+
+  <section>
+    <h2>二、設定排程刷新（讓報表資料自動更新）</h2>
+    <ol>
+      <li>登入 Power BI Service：<a href="https://app.powerbi.com" target="_blank">https://app.powerbi.com</a></li>
+      <li>在「我的工作區」中找到您剛剛發佈的報表旁的「資料集（Dataset）」</li>
+      <li>點選資料集右側「...」→ 選「設定（Settings）」</li>
+      <li>滾動到「排程重新整理（Scheduled refresh）」區域：
+        <ul>
+          <li>啟用排程</li>
+          <li>設定時間（例如每天 08:00 自動更新）</li>
+          <li>（選項）設定錯誤通知</li>
+        </ul>
+      </li>
+      <li>如使用本地資料來源（如 SQL Server）：
+        <ul>
+          <li>安裝並設定 On-premises Data Gateway</li>
+          <li>在「資料閘道器」區段設定連線</li>
+        </ul>
+      </li>
+    </ol>
+    <hr>
+  </section>
+
+  <section>
+    <h2>三、發佈到網頁並取得 iframe 代碼（Publish to Web）</h2>
+    <ul>
+      <li>適用於不含機密資料的公開報表</li>
+      <li>在 Power BI Service 中開啟報表頁面</li>
+      <li>點擊「檔案」 → 「發佈到網頁」</li>
+      <li>系統產生一段 <code>&lt;iframe&gt;</code> 代碼，例如：</li>
+    </ul>
+    <pre>
+&lt;iframe title="My Report" 
+        width="900" height="600" 
+        src="https://app.powerbi.com/view?r=eyJrIjoiEXAMPLE&amp;autoAuth=true&amp;ctid=EXAMPLE" 
+        frameborder="0" allowFullScreen="true"&gt;&lt;/iframe&gt;
+  </pre>
+    <p>將此 <code>&lt;iframe&gt;</code> 貼到你的網站 HTML 內指定位置即可。</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>四、內嵌示範畫面（HTML 網頁）</h2>
+    <p>假設你正在撰寫一個內部網頁，內容如下：</p>
+    <pre>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-Hant"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;即時更新的 Power BI 報表&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 40px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;每日自動更新的銷售儀表板&lt;/h1&gt;
+
+    &lt;!-- 內嵌 Power BI 報表 --&gt;
+    &lt;iframe title="Sales Dashboard" width="900" height="600"
+        src="https://app.powerbi.com/view?r=eyJrIjoiYOUR_TOKEN&amp;autoAuth=true&amp;ctid=YOUR_TENANT_ID"
+        frameborder="0" allowFullScreen="true"&gt;&lt;/iframe&gt;
+
+    &lt;p&gt;本報表資料每天早上 08:00 自動刷新&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+  </pre>
+    <p>每次使用者開啟此頁面時，看到的就是 Power BI 報表服務中最新排程刷新過後的內容。</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>小結</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th>組合項目</th>
+          <th>說明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Power BI 排程刷新</td>
+          <td>確保報表資料每日自動更新</td>
+        </tr>
+        <tr>
+          <td>iframe 嵌入</td>
+          <td>將報表嵌入網站中呈現，使用者即時瀏覽</td>
+        </tr>
+        <tr>
+          <td>資料一致性保障</td>
+          <td>資料來源有更新，報表會自動反映最新狀況</td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+  </section>
+
+
+</div>
+<div id="content12">
+  <h1>Power BI 不透過微軟 API 嵌入 Power BI 報表</h1>
+  <section>
+    <h2>方式 1：使用「發佈到 Web」公開嵌入（Publish to Web）</h2>
+    <h3>特點：</h3>
+    <ul>
+      <li>不需要 Azure AD、Access Token 或 API 開發</li>
+      <li>完全使用 Power BI 提供的 iframe 連結即可</li>
+      <li>只需一次設定，任何網站都能嵌入</li>
+    </ul>
+    <h3>作法：</h3>
+    <ol>
+      <li>開啟 Power BI Service 報表</li>
+      <li>點選「檔案 → 發佈到 Web」</li>
+      <li>取得 iframe 嵌入碼，例如：</li>
+    </ol>
+    <pre>
+&lt;iframe width="800" height="600" 
+  src="https://app.powerbi.com/view?r=eyJrIjoiXXXXXX" 
+  frameborder="0" allowFullScreen="true"&gt;&lt;/iframe&gt;
+  </pre>
+    <p>將這段 iframe 貼入你的網站 HTML</p>
+
+    <h3>限制：</h3>
+    <ul>
+      <li>報表會完全公開（無密碼保護）</li>
+      <li>不支援：
+        <ul>
+          <li>使用者登入控制</li>
+          <li>權限管理（例如：Row-Level Security）</li>
+          <li>自訂篩選互動控制</li>
+          <li>無 API 可控（如刷新、傳入參數）</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>適用場景：</h3>
+    <p>開放展示的數據儀表板（如新聞、行銷活動、公益資訊）</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>方式 2：將 Power BI 報表輸出為靜態圖片或 PDF 嵌入（報表快照）</h2>
+    <h3>特點：</h3>
+    <ul>
+      <li>完全離線、不依賴任何 Power BI 線上服務</li>
+      <li>可嵌入任何 HTML 頁面</li>
+    </ul>
+
+    <h3>作法：</h3>
+    <ol>
+      <li>在 Power BI Desktop 製作報表</li>
+      <li>使用「匯出 → PDF」或「匯出為圖片」</li>
+      <li>將圖片／PDF 上傳至你的網站伺服器</li>
+      <li>使用 <code>&lt;img&gt;</code> 或 <code>&lt;object&gt;</code> 內嵌</li>
+    </ol>
+    <pre>
+&lt;img src="/reports/sales_snapshot.png" alt="Sales Dashboard"&gt;
+  </pre>
+
+    <h3>限制：</h3>
+    <ul>
+      <li>完全靜態，無法互動</li>
+      <li>無法自動更新（需每次手動匯出）</li>
+      <li>無法篩選、下鑽或交叉互動</li>
+    </ul>
+
+    <h3>適用場景：</h3>
+    <p>單純視覺展示、不需即時互動的報表</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>方式 3：Power BI + Power Automate 將報表快照定期更新至網站</h2>
+    <h3>特點：</h3>
+    <ul>
+      <li>自動更新圖片（例如每日早上 8 點匯出）</li>
+      <li>可讓網站每次顯示最新快照</li>
+    </ul>
+
+    <h3>作法：</h3>
+    <ol>
+      <li>使用 Power Automate 建立流程：</li>
+      <ul>
+        <li>觸發器：每日排程</li>
+        <li>動作：使用 Power BI Connector 匯出報表為圖片</li>
+        <li>儲存到 OneDrive / SharePoint / FTP / 網站資源資料夾</li>
+      </ul>
+      <li>網站用 <code>&lt;img&gt;</code> 讀取這張圖片</li>
+    </ol>
+    <pre>
+&lt;img src="https://yourdomain.com/pbi_snapshots/daily_report.png"&gt;
+  </pre>
+
+    <h3>限制：</h3>
+    <ul>
+      <li>還是無法互動，但可實現「定時自動更新」</li>
+    </ul>
+
+    <h3>適用場景：</h3>
+    <p>需要定期更新報表圖片但無互動需求的內部頁面</p>
+    <hr>
+  </section>
+
+  <section>
+    <h2>小結：不用 Microsoft API 的嵌入方式比較</h2>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th>方法</th>
+          <th>可互動</th>
+          <th>自動更新</th>
+          <th>權限控制</th>
+          <th>難度</th>
+          <th>適合場景</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>發佈到 Web</td>
+          <td>是</td>
+          <td>是</td>
+          <td>否</td>
+          <td>★</td>
+          <td>公開展示</td>
+        </tr>
+        <tr>
+          <td>靜態圖片 / PDF 匯出</td>
+          <td>否</td>
+          <td>否</td>
+          <td>可（靠網站控管）</td>
+          <td>★</td>
+          <td>簡單報表展示、離線頁面</td>
+        </tr>
+        <tr>
+          <td>Power Automate 匯出快照</td>
+          <td>否</td>
+          <td>是</td>
+          <td>否</td>
+          <td>★★</td>
+          <td>頻繁更新但無互動需求的報表</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>建議：</h3>
+    <p>若你完全不希望使用 Microsoft 的 API，但又要「自動更新」報表顯示，推薦做法是：</p>
+    <p><strong>使用 排程刷新 + 發佈到 Web + iframe</strong></p>
+    <p>這樣雖然報表公開，但使用者在你的網站上看到的，會是 Power BI Service 上最新資料集排程刷新後的報表，而你也不需要寫任何 API 或管理 token。</p>
+    <hr>
+  </section>
+
+</div>
+<div id="content13">
+  <h1>Windows 工作排程器定時執行 Python 程式教學</h1>
+
+  <section>
+    <h2>一、準備你的主程式</h2>
+    <p>確保你的主程式 <code>main.py</code> 可以單獨運行，並放在固定路徑，例如：</p>
+    <pre><code>C:\MyTasks\CSVWatcher\main.py</code></pre>
+    <p>建議使用完整絕對路徑以確保穩定。</p>
+  </section>
+
+  <section>
+    <h2>二、建立一個啟動批次檔（可選但推薦）</h2>
+    <p>建立一個 <code>.bat</code> 檔案（例如 <code>run_csv_task.bat</code>）來執行 Python 程式：</p>
+
+    <h3>範例：run_csv_task.bat</h3>
+    <pre><code>@echo off
+cd /d C:\MyTasks\CSVWatcher
+python main.py</code></pre>
+
+    <p>請確認系統環境變數有正確設定 Python，或使用完整 Python 路徑，例如：</p>
+
+    <pre><code>"C:\Users\YourUser\AppData\Local\Programs\Python\Python311\python.exe" main.py</code></pre>
+  </section>
+
+  <section>
+    <h2>三、設定 Windows 工作排程器</h2>
+    <ol>
+      <li>按下「開始」→ 搜尋「工作排程器（Task Scheduler）」→ 開啟。</li>
+      <li>點選右側「建立基本工作（Create Basic Task）」。</li>
+      <li>輸入任務名稱，例如 <strong>CSV Watcher Job</strong>。</li>
+      <li>觸發條件選擇「每日」或「一次」。</li>
+      <li>建立後編輯觸發條件為「每 10 分鐘執行一次，持續 1 天」。</li>
+      <li>動作選擇「啟動程式（Start a program）」。</li>
+      <li>程式：<code>cmd.exe</code></li>
+      <li>參數：
+        <pre><code>/c "C:\MyTasks\CSVWatcher\run_csv_task.bat"</code></pre>
+      </li>
+      <li>點擊「完成」。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>四、進階選項（可手動設定）</h2>
+    <p>建立後可點選任務 → 右鍵「內容」→「觸發條件」→ 編輯：</p>
+    <ul>
+      <li>勾選「重複此任務間隔」：10 分鐘</li>
+      <li>持續時間：1 天或無限</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>五、測試任務是否有效</h2>
+    <ol>
+      <li>在 Task Scheduler 中右鍵點選任務 →「執行」。</li>
+      <li>檢查是否執行成功（可在 Python 中加入 <code>print()</code> 或寫入 <code>log.txt</code> 來驗證）。</li>
+      <li>若無反應，可手動在命令列測試 bat 檔：</li>
+    </ol>
+    <pre><code>cd /d C:\MyTasks\CSVWatcher
+run_csv_task.bat</code></pre>
+  </section>
+
+  <section>
+    <h2>小技巧：加入日誌</h2>
+    <p>在 <code>main.py</code> 中加入簡單 log 機制方便除錯：</p>
+    <pre><code>with open("log.txt", "a", encoding="utf-8") as f:
+    f.write("檢查開始於：" + time.ctime() + "\n")</code></pre>
+  </section>
+</div>

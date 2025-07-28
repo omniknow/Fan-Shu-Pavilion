@@ -1,0 +1,1023 @@
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ 資料庫正規化</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content2">⭕ Power BI：將文字欄位編碼為數值</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content3">⭕ Power BI：多日期欄位分析建議</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content4">⭕ Power BI：DAX語法優化-IN</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content5">⭕ Power BI：DAX建立表格-使用ROW(動態)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content6">⭕ Power BI：DAX建立表格-使用SELECTCOLUMNS(靜態)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content7">⭕ Power BI：DAX建立表格-使用DATATABLE(靜態)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content8">⭕ Power BI：如何建立中繼查詢（Staging Query)</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content9">⭕ Power BI：Power Query 和 Power BI作業流程說明</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content10">⭕ Power BI：Power BI 中繼查詢範本</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content11">⭕ Power BI：CSV 和 Parquet 格式在 Power BI 中的表現差異</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content12">⭕ Power BI：欄位進行「加總、平均」時使用 ??，可能的錯誤</a></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+<div id="content1">
+    <section class="section">
+        <h1>資料庫正規化</h1>
+        <h2>1. 資料庫正規化（Database Normalization）</h2>
+        <p>
+            指的是資料建模階段，將資料拆成多個有邏輯關係的表（例如：把「客戶」、「訂單」拆開），目的是避免重複、提升效率與一致性。
+        </p>
+        <p><strong>例如：</strong><br>
+            一張表有多筆重複的「客戶名稱」：可抽出為「客戶表」，以 <code>CustomerID</code> 關聯回訂單表。</p>
+        <p>拆成 <strong>維度表</strong> 與 <strong>事實表</strong></p>
+        <p><strong>在 Power BI 中這種正規化通常是：</strong></p>
+        <ul>
+            <li>在 Power Query 中拆表（Group by + Merge）</li>
+            <li>或在資料來源前（如 SQL）先行正規化</li>
+        </ul>
+        <hr>
+    </section>
+
+    <section class="section">
+        <h2>2. 數值正規化（Numeric Normalization / 標準化）</h2>
+        <p>
+            是指把數值欄位標準化成某個範圍，比如：
+        </p>
+        <ul>
+            <li><strong>Min-Max 正規化：</strong>把數值轉成 0 到 1 之間<br>
+                <code>Normalized = (Value - Min) / (Max - Min)</code>
+            </li>
+            <li><strong>Z-score 標準化：</strong>常用於統計、ML 模型<br>
+                <code>Z = (X - Mean) / StdDev</code>
+            </li>
+        </ul>
+        <p><strong>在 Power BI 中，這可以用：</strong></p>
+        <ul>
+            <li>Power Query（M 語言）來加欄位運算</li>
+            <li>或在報表中用 DAX 寫計算欄位/度量值</li>
+        </ul>
+        <hr>
+    </section>
+
+    <section class="section">
+        <h2>3. 文字正規化（Text Normalization）</h2>
+        <p>
+            像是去除多餘空白、轉小寫、清除符號等，可在 Power Query 中使用：
+        </p>
+        <pre><code>Text.Trim(Text.Lower([欄位名稱]))</code></pre>
+        <hr>
+    </section>
+</div>
+<div id="content2">
+    <h1>Power BI：將文字欄位編碼為數值</h1>
+
+    <section class="section">
+        <h2>概念說明</h2>
+        <p>在 Power BI 或 Power Query 中，將某個「文字欄位」用對應的「數值」取代，是一種常見的 <strong>編碼（Encoding）</strong> 方法，尤其在：</p>
+        <ul>
+            <li>資料前處理</li>
+            <li>分類變數轉為數值（如做數據分析或機器學習）</li>
+        </ul>
+        <hr>
+    </section>
+
+    <section class="section">
+        <h2>範例說明</h2>
+        <p>假設有一欄「顏色」如下：</p>
+        <table>
+            <tr>
+                <th>顏色</th>
+            </tr>
+            <tr>
+                <td>紅色</td>
+            </tr>
+            <tr>
+                <td>藍色</td>
+            </tr>
+            <tr>
+                <td>綠色</td>
+            </tr>
+        </table>
+
+        <p>您希望轉換為：</p>
+        <table>
+            <tr>
+                <th>顏色</th>
+                <th>顏色代碼</th>
+            </tr>
+            <tr>
+                <td>紅色</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>藍色</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>綠色</td>
+                <td>3</td>
+            </tr>
+        </table>
+    </section>
+
+    <section class="section">
+        <h2>方法一：使用 Power Query 條件邏輯</h2>
+        <ol>
+            <li>進入 Power Query 編輯器，選擇您的主表。</li>
+            <li>點選「<strong>新增資料欄</strong>」 > 「<strong>條件欄位</strong>」。</li>
+            <li>設定條件如下：</li>
+        </ol>
+
+        <ul>
+            <li>如果 顏色 = 紅色，則 1</li>
+            <li>如果 顏色 = 藍色，則 2</li>
+            <li>如果 顏色 = 綠色，則 3</li>
+        </ul>
+
+        <p><strong>結果：</strong>會產生一個名為「顏色代碼」的新欄位。</p>
+
+        <p><strong>生成的 M 語法如下：</strong></p>
+        <pre>
+= Table.AddColumn(原始表, "顏色代碼", each 
+    if [顏色] = "紅色" then 1 
+    else if [顏色] = "藍色" then 2 
+    else if [顏色] = "綠色" then 3 
+    else null)
+        </pre>
+        <hr>
+    </section>
+
+    <section class="section">
+        <h2>方法二：建立對照表 + 合併查詢（推薦）</h2>
+        <p>若文字與數值對應較多，建議用「合併查詢」搭配「對照表」處理。</p>
+
+        <p><strong>對照表範例如下：</strong></p>
+        <table>
+            <tr>
+                <th>顏色</th>
+                <th>顏色代碼</th>
+            </tr>
+            <tr>
+                <td>紅色</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>藍色</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>綠色</td>
+                <td>3</td>
+            </tr>
+        </table>
+
+        <p><strong>步驟：</strong></p>
+        <ol>
+            <li>將對照表也載入到 Power BI。</li>
+            <li>在 Power Query 編輯器中，選擇主表，點選「合併查詢」。</li>
+            <li>以主表的「顏色」對應對照表的「顏色」。</li>
+            <li>合併後展開欄位，選擇「顏色代碼」。</li>
+        </ol>
+        <hr>
+    </section>
+
+    <section class="section">
+        <h2>小技巧：使用 DAX 實作（模型階段處理）</h2>
+        <p>如果要在 DAX 層級處理，也可以用 <code>SWITCH</code> 函數：</p>
+        <pre>
+顏色代碼 = 
+SWITCH(
+    TRUE(),
+    [顏色] = "紅色", 1,
+    [顏色] = "藍色", 2,
+    [顏色] = "綠色", 3,
+    BLANK()
+)
+        </pre>
+        <p><strong>建議：</strong>若可行，盡量在 Power Query 階段先完成轉換，模型會更乾淨且可維護性更高。</p>
+    </section>
+</div>
+<div id="content3">
+    <h1>Power BI 多日期欄位分析建議</h1>
+
+    <p>你有一個 Fact Table（例如：訂單或交易資料），裡面有三個日期欄位：</p>
+    <ul>
+        <li>入住日期</li>
+        <li>退房日期</li>
+        <li>訂房日期</li>
+    </ul>
+
+    <p>並有一個獨立的 <strong>日期資料表（Date Table）</strong></p>
+
+    <h2>Power BI 限制</h2>
+    <p>每張表對同一個日期表只能有一個「實線」關聯（Active Relationship）。</p>
+
+    <h2>問題核心</h2>
+    <p>Power BI 只允許你在一個時間點使用一個「主關聯（實線）」來做計算。其他的關聯只能是「虛線（Inactive）」—— 這意味著你得自己控制「要用哪個日期」來做分析。</p>
+
+    <h2>建議解法：用 DAX 配合 USERELATIONSHIP</h2>
+    <p>在模型中：</p>
+    <ul>
+        <li>在 Fact Table 中，三個日期欄都與 Date Table 建立關聯</li>
+        <li>選擇其中一個（例如「入住日期」）作為「實線關聯」</li>
+        <li>其他兩個（退房、訂房）保持為「虛線關聯」</li>
+        <li>在 DAX 中動態選擇你要分析的日期</li>
+    </ul>
+
+    <h3>範例：</h3>
+
+    <p>以「入住日期」為主的計算（不需特別處理，因為是實線關聯）：</p>
+    <pre><code>入住人數 = COUNTROWS(FactTable)</code></pre>
+
+    <p>以「退房日期」為主的計算：</p>
+    <pre><code>退房人數 = 
+CALCULATE(
+    COUNTROWS(FactTable),
+    USERELATIONSHIP(FactTable[退房日期], DateTable[Date])
+)</code></pre>
+
+    <p>以「訂房日期」為主的計算：</p>
+    <pre><code>訂單數量 = 
+CALCULATE(
+    COUNTROWS(FactTable),
+    USERELATIONSHIP(FactTable[訂房日期], DateTable[Date])
+)</code></pre>
+
+    <h2>額外建議：建立一個切換維度的方式（進階）</h2>
+    <p>如果你想讓使用者自由選擇分析的日期類型（入住/退房/訂房），你可以這樣做：</p>
+
+    <p>建立一張日期類型維度表：</p>
+    <pre><code>日期類型 = DATATABLE("選擇", STRING, {{"入住日期"}, {"退房日期"}, {"訂房日期"}})</code></pre>
+
+    <p>加入一個切換欄位的 measure：</p>
+    <pre><code>彈性分析人數 =
+SWITCH(
+    SELECTEDVALUE('日期類型'[選擇]),
+    "入住日期", CALCULATE(COUNTROWS(FactTable)),
+    "退房日期", CALCULATE(COUNTROWS(FactTable), USERELATIONSHIP(FactTable[退房日期], DateTable[Date])),
+    "訂房日期", CALCULATE(COUNTROWS(FactTable), USERELATIONSHIP(FactTable[訂房日期], DateTable[Date]))
+)</code></pre>
+
+    <p>將 <strong>日期類型</strong> 放在報表的 slicer 供使用者選擇。</p>
+
+    <h2>總結</h2>
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>日期欄位</th>
+                <th>關聯狀態</th>
+                <th>使用方式</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>入住日期</td>
+                <td>實線（主關聯）</td>
+                <td>可直接用</td>
+            </tr>
+            <tr>
+                <td>退房/訂房日期</td>
+                <td>虛線（備用關聯）</td>
+                <td>用 USERELATIONSHIP() 啟用</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div id="content4">
+    <h1>DAX語法優化-IN</h1>
+    <h3>原寫法：</h3>
+    <pre><code>VAR taoyuan_cnt = COUNTAX(
+    FILTER(
+        ALL(air_quality), 
+        air_quality[county] = "taoyuan city" && 
+        (air_quality[status] = "good" || air_quality[status] = "moderate")
+    ), 
+    air_quality[date]
+)</code></pre>
+
+    <h3>改成使用 IN 的寫法如下：</h3>
+    <pre><code>VAR taoyuan_cnt = COUNTAX(
+    FILTER(
+        ALL(air_quality), 
+        air_quality[county] = "taoyuan city" && 
+        air_quality[status] IN { "good", "moderate" }
+    ), 
+    air_quality[date]
+)</code></pre>
+
+    <h3>IN &#123; "good", "moderate" &#125; 的意思是：</h3>
+    <p>等同於 <code>(air_quality[status] = "good" || air_quality[status] = "moderate")</code>，但更簡潔易讀。</p>
+
+</div>
+<div id="content5">
+    <h1>Power BI：DAX建立表格-使用ROW(動態)</h1>
+    <h2>DAX 表格變數 <code>cnt_table</code> 說明</h2>
+
+    <p>這段 DAX 公式建立了一個新的表格變數 <code>cnt_table</code>，其目的是組合多個城市與各自對應的計算數值（通常是某種計數結果），形成一個結構化的表格。</p>
+
+    <h3>結構說明：</h3>
+
+    <pre><code>VAR cnt_table =
+    UNION(
+        ROW("city", "taipei city", "cnt", taipie_cnt),
+        ROW("city", "new taipei city", "cnt", new_taipei_cnt),
+        ROW("city", "taoyuan city", "cnt", taoyuan_cnt),
+        ROW("city", "taichung city", "cnt", taichung_cnt),
+        ROW("city", "tainan city", "cnt", tainan_cnt),
+        ROW("city", "kaohsiung city", "cnt", kaohsiung_cnt)
+    )</code></pre>
+
+    <h3>元素逐一說明：</h3>
+    <ul>
+        <li><strong>VAR cnt_table</strong>：定義一個變數，名稱是 <code>cnt_table</code>。</li>
+        <li><strong>ROW(...)</strong>：建立一列（row）資料，欄位名稱與值成對出現。<br>
+            例如：<code>ROW("city", "taipei city", "cnt", taipie_cnt)</code><br>
+            表示：城市為「taipei city」，其對應的統計值為 <code>taipie_cnt</code>
+        </li>
+        <li><strong>UNION(...)</strong>：將多個 <code>ROW</code> 結果合併為一個表格，行數增加。</li>
+    </ul>
+
+    <h3>最後形成的表格樣子如下（6 列 2 欄）：</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>city</th>
+                <th>cnt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>taipei city</td>
+                <td>taipie_cnt</td>
+            </tr>
+            <tr>
+                <td>new taipei city</td>
+                <td>new_taipei_cnt</td>
+            </tr>
+            <tr>
+                <td>taoyuan city</td>
+                <td>taoyuan_cnt</td>
+            </tr>
+            <tr>
+                <td>taichung city</td>
+                <td>taichung_cnt</td>
+            </tr>
+            <tr>
+                <td>tainan city</td>
+                <td>tainan_cnt</td>
+            </tr>
+            <tr>
+                <td>kaohsiung city</td>
+                <td>kaohsiung_cnt</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>註</strong>：這裡的 <code>taipie_cnt</code> 等應是你在前面定義的變數，例如經過 <code>COUNTAX</code> 或其他統計方式計算出來的數值。</p>
+
+    <h3>用途：</h3>
+    <ul>
+        <li>建立一個彙總表（summary table）供後續分析或視覺化</li>
+        <li>做為 <code>RETURN</code> 的結果，用於表格視覺化中顯示多個城市的統計比較</li>
+        <li>進一步做篩選、排序、加總等操作</li>
+    </ul>
+
+    <h3>輸出至視覺化：</h3>
+    <p>若你想把這個表格輸出給 Power BI 的表格視覺化使用，可以在公式中加入：</p>
+
+    <pre><code>RETURN
+    cnt_table</code></pre>
+</div>
+<div id="content6">
+    <h1>Power BI：DAX建立表格-使用SELECTCOLUMNS(靜態)</h1>
+    <h2>DAX 精簡寫法：<code>ROW + UNION</code> 的替代方案</h2>
+
+    <p><strong>在 DAX 中，<code>ROW + UNION</code> 是最簡潔的原生寫法之一。</strong></p>
+
+    <h3>可讀性上的微調（仍屬同類寫法）：</h3>
+    <p>你可以將欄位名稱提到外層，讓每列只寫值，看起來較整齊：</p>
+
+    <pre><code>VAR cnt_table =
+    SELECTCOLUMNS(
+        {
+            {"taipei city", taipie_cnt},
+            {"new taipei city", new_taipei_cnt},
+            {"taoyuan city", taoyuan_cnt},
+            {"taichung city", taichung_cnt},
+            {"tainan city", tainan_cnt},
+            {"kaohsiung city", kaohsiung_cnt}
+        },
+        "city", [Value1],
+        "cnt", [Value2]
+    )</code></pre>
+
+    <h3>解釋：</h3>
+    <ul>
+        <li><strong>SELECTCOLUMNS()</strong>：用來重新命名欄位</li>
+        <li>裡面的 <code>{ {...}, {...}, ... }</code> 是建立表格的寫法，<code>Value1</code> 和 <code>Value2</code> 是內部欄位名稱</li>
+        <li>這種寫法避免了重複撰寫欄位名稱 <code>"city"</code> 和 <code>"cnt"</code></li>
+    </ul>
+
+    <h3>優點：</h3>
+    <ul>
+        <li>更整齊、易讀</li>
+        <li>避免重複寫 <code>"city"</code> 和 <code>"cnt"</code> 六次</li>
+    </ul>
+
+    <h3>限制：</h3>
+    <ul>
+        <li>本質上還是手動建立表格，無法動態根據資料模型擴充城市數量</li>
+    </ul>
+
+    </body>
+
+    </html>
+</div>
+<div id="content7">
+    <h1>Power BI：DAX建立表格-使用DATATABLE(靜態)</h1>
+    <h2>用 DATATABLE 明確定義欄位</h2>
+
+    <pre><code class="language-dax">
+VAR cnt_table2 = 
+    DATATABLE(
+        "city", STRING,
+        "cnt", INTEGER,
+        {
+            {"taipei city", taipie_cnt},
+            {"new taipei city", new_taipei_cnt},
+            {"taoyuan city", taoyuan_cnt},
+            {"taichung city", taichung_cnt},
+            {"tainan city", tainan_cnt},
+            {"kaohsiung city", kaohsiung_cnt}
+        }
+    )
+</code></pre>
+    <p>DATATABLE 需要你明確指定欄位名稱與類型，這樣用 <code>[city]</code> 和 <code>[cnt]</code> 就不會有錯誤。</p>
+</div>
+<div id="content8">
+    <h1>Power BI:如何建立中繼查詢（Staging Query)</h1>
+    <section>
+        <h2>如何建立中繼查詢（Staging Query）</h2>
+
+        <h3>目標：</h3>
+        <p>把整段查詢拆成「來源清理階段（staging）」與「主處理階段」，前者當作中繼資料來源，後者只負責進一步的轉換與視覺化使用。</p>
+    </section>
+
+    <section>
+        <h3>步驟如下：</h3>
+
+        <h4>1. 建立中繼查詢（staging）</h4>
+        <ul>
+            <li>打開 Power BI 的 Power Query 編輯器（首頁 &gt; 轉換資料）。</li>
+            <li>找到你目前的查詢，複製一份。</li>
+            <li>右鍵 → 複製</li>
+            <li>再點右鍵空白處 → 貼上</li>
+            <li>將新查詢命名為：<code>stg_air_quality</code>（可自由命名）</li>
+            <li>在這份 <code>stg_air_quality</code> 查詢中，保留到你想分層的位置為止</li>
+            <li>例如保留到這一步：</li>
+        </ul>
+
+        <pre><code>已變更類型1 = Table.TransformColumnTypes(已將標頭升階,{{"date", type datetime}, ...}),
+in
+    已變更類型1</code></pre>
+
+        <h4>2. 關閉「載入」這個中繼查詢（避免載入資料表到報表畫面）</h4>
+        <ul>
+            <li>在 Power Query 編輯器左側的查詢清單中，右鍵 <code>stg_air_quality</code> → 取消勾選「啟用載入」</li>
+            <li>這樣它只做為「資料來源」，不會直接載入到報表。</li>
+        </ul>
+
+        <h4>3. 建立主查詢（使用中繼查詢當資料來源）</h4>
+        <ul>
+            <li>在你的主查詢中（原始查詢或新建一個），用 <code>stg_air_quality</code> 作為來源：</li>
+        </ul>
+
+        <pre><code>let
+    來源 = stg_air_quality,  // 直接引用 staging 查詢
+
+    // 以下繼續你的資料處理步驟
+    已重覆資料行 = Table.DuplicateColumn(來源, "date", "date - 複製"),
+    ...
+    已新增索引 = Table.AddIndexColumn(已重新命名資料行3, "索引", 1, 1, Int64.Type),
+    ...
+in
+    已合併查詢1</code></pre>
+    </section>
+
+    <section>
+        <h3>好處總結：</h3>
+        <table border="1" cellspacing="0" cellpadding="8">
+            <thead>
+                <tr>
+                    <th>特色</th>
+                    <th>好處</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>分層設計</td>
+                    <td>易讀、易維護</td>
+                </tr>
+                <tr>
+                    <td>資料來源只讀一次</td>
+                    <td>多個查詢可共用來源資料，不用每次都重新載入檔案</td>
+                </tr>
+                <tr>
+                    <td>關閉「載入」的 staging 查詢</td>
+                    <td>減少報表中不必要的資料表</td>
+                </tr>
+                <tr>
+                    <td>可以為 staging 層加上各種快取優化邏輯</td>
+                    <td>更快預覽、轉換資料</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+<div id="content9">
+    <h1>Power BI：Power Query 和 Power BI作業流程說明</h1>
+    <section>
+        <h2>不需要在 Power Query 和 Power BI 之間頻繁切換！</h2>
+        <p>整個中繼查詢的流程與分層架構，你可以完全在 Power Query 編輯器中完成，然後一次性地將結果「套用」回 Power BI。</p>
+    </section>
+
+    <section>
+        <h3>作業流程說明：只切換一次</h3>
+        <p>工作流程如下：</p>
+        <table border="1" cellpadding="6" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>階段</th>
+                    <th>在哪裡完成</th>
+                    <th>說明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1. 資料匯入與建立中繼查詢</td>
+                    <td>Power Query 編輯器</td>
+                    <td>完成所有 Source → Clean → Model → Report 層級查詢。包括清洗、格式轉換、參考、合併等作業。</td>
+                </tr>
+                <tr>
+                    <td>2. 套用變更 → 載入模型</td>
+                    <td>點選「關閉並套用」（Close & Apply）</td>
+                    <td>把你在 Power Query 中處理好的查詢載入 Power BI 的資料模型</td>
+                </tr>
+                <tr>
+                    <td>3. 視覺化設計、DAX 計算欄位與報表建立</td>
+                    <td>Power BI 主畫面（報表設計介面）</td>
+                    <td>建立圖表、度量值、切片器等報表內容</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h3>所以，你只需切換這一次：</h3>
+        <ul>
+            <li>在 Power BI 點 「轉換資料」 → 進入 Power Query 編輯器</li>
+            <li>在 Power Query 完成所有中繼查詢與清洗處理</li>
+            <li>點選 「關閉並套用」 → 回到 Power BI 主畫面，進行報表與視覺化設計</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>進階提醒：</h3>
+        <ul>
+            <li>Power Query 處理的是 ETL（Extract, Transform, Load）階段的資料轉換</li>
+            <li>Power BI 主畫面處理的是 報表呈現、DAX 計算、互動性設計</li>
+        </ul>
+        <p>這兩部分各司其職，你只要確保資料先在 Power Query 整理好，報表端就會順得多。</p>
+    </section>
+
+    <section>
+        <h3>建議策略：</h3>
+        <h4>在 Power Query 內：</h4>
+        <ul>
+            <li>先做好中繼查詢分層</li>
+            <li>命名與註解清楚</li>
+            <li>做完一次性「關閉並套用」</li>
+        </ul>
+        <h4>然後進 Power BI 報表頁再處理：</h4>
+        <ul>
+            <li>DAX 公式</li>
+            <li>度量值 (Measures)</li>
+            <li>視覺化元件</li>
+        </ul>
+    </section>
+
+
+</div>
+<div id="content10">
+    <h1>Power BI:Power BI 中繼查詢範本</h1>
+    <section>
+        <h2>Power BI 中繼查詢範本（.pbix 架構說明版）</h2>
+        <p>我會提供給你：</p>
+        <ul>
+            <li>各查詢層級的建立方式</li>
+            <li>命名與註解範例</li>
+            <li>建議資料流程（Query Dependency）</li>
+            <li>建立查詢的步驟說明</li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>範本內容設計（你可直接在 Power BI 中實作）</h3>
+
+        <section>
+            <h4>1. Source_Sales（來源層）</h4>
+            <ul>
+                <li>匯入來源資料（CSV/Excel/SQL 等）</li>
+                <li>僅保留連線與基本欄位命名（如欄位重新命名為統一格式）</li>
+                <li>右鍵查詢 → 關閉載入</li>
+            </ul>
+            <p><strong>註解說明：</strong></p>
+            <blockquote>原始資料來源，僅作為中繼查詢，不直接載入模型。</blockquote>
+        </section>
+
+        <section>
+            <h4>2. Clean_Sales（清洗層）</h4>
+            <ul>
+                <li>使用「參考」建立自 Source_Sales</li>
+                <li>清除空值、標準化欄位格式（如日期、文字轉換）</li>
+                <li>建立必要的資料型別設定</li>
+                <li>保留載入設定（啟用載入）</li>
+            </ul>
+            <p><strong>註解說明：</strong></p>
+            <blockquote>資料清洗層，將來源資料做欄位格式與內容的淨化處理。</blockquote>
+        </section>
+
+        <section>
+            <h4>3. Model_Sales（模型層）</h4>
+            <ul>
+                <li>使用「參考」建立自 Clean_Sales</li>
+                <li>加上商業邏輯：新增計算欄位（例如利潤、等級、分類）</li>
+                <li>若有主從表格關係，也可建立維度表（Dim_Product, Dim_Customer）</li>
+                <li>啟用載入</li>
+            </ul>
+            <p><strong>註解說明：</strong></p>
+            <blockquote>商業邏輯轉換層，加入必要欄位以供報表使用。</blockquote>
+        </section>
+
+        <section>
+            <h4>4. Rpt_SalesSummary（報表層，可選）</h4>
+            <ul>
+                <li>使用「參考」建立自 Model_Sales</li>
+                <li>建立匯總表格、排序清單、前 N 筆清單</li>
+                <li>為報表視覺設計提供最終簡化資料表</li>
+            </ul>
+            <p><strong>註解說明：</strong></p>
+            <blockquote>報表呈現用查詢，僅處理格式與匯總需求。</blockquote>
+        </section>
+    </section>
+
+    <section>
+        <h3>Query Dependency 依賴視圖</h3>
+        <pre>
+Source_Sales
+     ↓
+Clean_Sales
+     ↓
+Model_Sales
+     ↓
+Rpt_SalesSummary（可選）
+  </pre>
+    </section>
+
+    <section>
+        <h3>製作這個架構步驟（可操作）</h3>
+        <ol>
+            <li>匯入一筆簡單資料（例如 Excel 中的銷售資料）</li>
+            <li>將原始匯入查詢重新命名為 <strong>Source_Sales</strong></li>
+            <li>右鍵 → 參考 → 命名為 <strong>Clean_Sales</strong> → 做清洗處理</li>
+            <li>再對 <strong>Clean_Sales</strong> 參考 → 命名為 <strong>Model_Sales</strong> → 加入分類欄位、計算欄位</li>
+            <li>可選擇再參考一次建立 <strong>Rpt_SalesSummary</strong>，只做排序、彙總、TOP N</li>
+        </ol>
+    </section>
+
+    <section>
+        <h3>範例 DAX 搭配（放在報表中）</h3>
+        <p>在 <strong>Model_Sales</strong> 中你可以使用 DAX 建立計算欄位，例如：</p>
+        <pre><code>
+Profit = [SalesAmount] - [Cost]
+Category = IF([Profit] > 1000, "High", "Low")
+  </code></pre>
+    </section>
+
+<section>
+  <h3>額外建議</h3>
+  <ul>
+    <li>加上資料流程文件（架構圖），給報表使用者與其他開發者更好維護</li>
+    <li>使用顏色標籤（Power Query 裡點右鍵可改顏色）給不同層級標示：
+      <ul>
+        <li>Source（綠色）</li>
+        <li>Clean（黃色）</li>
+        <li>Model（藍色）</li>
+        <li>Report（紅色）</li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+</div>
+<div id="content11">
+    <h1>Power BI：CSV 和 Parquet 格式在 Power BI 中的表現差異</h1>
+<section>
+  <h2>一、CSV vs. Parquet 的檔案格式差異</h2>
+  <table border="1" cellspacing="0" cellpadding="6">
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th>CSV</th>
+        <th>Parquet</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>格式類型</td>
+        <td>純文字（文字分隔）</td>
+        <td>二進位（列式存儲）</td>
+      </tr>
+      <tr>
+        <td>壓縮支援</td>
+        <td>無內建壓縮（手動壓 zip/gzip）</td>
+        <td>自帶高效壓縮（如 Snappy）</td>
+      </tr>
+      <tr>
+        <td>資料存儲方式</td>
+        <td>橫向存儲（Row-based）</td>
+        <td>直向存儲（Columnar-based）</td>
+      </tr>
+      <tr>
+        <td>大小差異</td>
+        <td>檔案通常比較大</td>
+        <td>可小 2~10 倍以上</td>
+      </tr>
+      <tr>
+        <td>人眼可讀</td>
+        <td>是</td>
+        <td>否（需工具或程式打開）</td>
+      </tr>
+      <tr>
+        <td>資料類型支援</td>
+        <td>通常會有型別問題（全部當成字串）</td>
+        <td>嚴格型別定義（支援更多原生型別）</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>二、載入 Power BI 的差異</h2>
+  <table border="1" cellspacing="0" cellpadding="6">
+    <thead>
+      <tr>
+        <th>比較項目</th>
+        <th>CSV</th>
+        <th>Parquet</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>載入方式</td>
+        <td>使用 Power Query 中的「CSV 檔案」</td>
+        <td>使用「Parquet 檔案」</td>
+      </tr>
+      <tr>
+        <td>載入速度</td>
+        <td>較慢（尤其是大檔案）</td>
+        <td>較快（因為壓縮 + columnar）</td>
+      </tr>
+      <tr>
+        <td>預設型別處理</td>
+        <td>可能讀錯型別（如數字變字串）</td>
+        <td>型別更正確（根據 Parquet schema）</td>
+      </tr>
+      <tr>
+        <td>記憶體使用</td>
+        <td>高</td>
+        <td>低（僅讀需要的欄位）</td>
+      </tr>
+      <tr>
+        <td>支援增量讀取</td>
+        <td>無</td>
+        <td>可與 Data Lake、Synapse 整合，進行更進階應用</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>三、執行查詢的過程差異</h2>
+  <table border="1" cellspacing="0" cellpadding="6">
+    <thead>
+      <tr>
+        <th>查詢過程</th>
+        <th>CSV</th>
+        <th>Parquet</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>查詢模式</td>
+        <td>需整個檔案都讀入記憶體（哪怕只用一欄）</td>
+        <td>只需讀取實際使用的欄位（columnar）</td>
+      </tr>
+      <tr>
+        <td>適合的資料量級</td>
+        <td>小型資料（數千～數十萬筆）</td>
+        <td>中大型資料（百萬～千萬筆以上）</td>
+      </tr>
+      <tr>
+        <td>查詢效能</td>
+        <td>查一欄也要掃整筆資料</td>
+        <td>只查用到的欄，大幅提速</td>
+      </tr>
+      <tr>
+        <td>可搭配的查詢引擎</td>
+        <td>單純依賴 Power BI</td>
+        <td>可配合 Power BI + Dataflows / Synapse / Fabric Lakehouse 等使用 Parquet</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>結論：何時選用 CSV vs. Parquet？</h2>
+  <table border="1" cellspacing="0" cellpadding="6">
+    <thead>
+      <tr>
+        <th>狀況</th>
+        <th>建議格式</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>開發測試、小檔案、與 Excel 搭配</td>
+        <td>CSV</td>
+      </tr>
+      <tr>
+        <td>生產環境、大數據、效能敏感、與 Data Lake 整合</td>
+        <td>Parquet</td>
+      </tr>
+      <tr>
+        <td>預計資料不常變動，但要快讀快查</td>
+        <td>Parquet</td>
+      </tr>
+      <tr>
+        <td>資料需長期儲存與歷史追溯</td>
+        <td>Parquet（壓縮節省空間）</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>補充小技巧（Power BI + Parquet）</h2>
+  <ul>
+    <li>Parquet 可與 Azure Data Lake Storage Gen2 整合使用。</li>
+    <li>Power BI Desktop 可以直接匯入 .parquet 檔案，或搭配 Dataflow 使用。</li>
+    <li>Power BI 的 DirectQuery 模式不支援 Parquet（目前僅 Import 模式），但可搭配 Synapse / Fabric 處理。</li>
+  </ul>
+</section>
+
+    <section>
+        <h3>額外建議</h3>
+        <ul>
+            <li>加上資料流程文件（架構圖），給報表使用者與其他開發者更好維護</li>
+            <li>使用顏色標籤（Power Query 裡點右鍵可改顏色）給不同層級標示：
+                <ul>
+                    <li>Source（綠色）</li>
+                    <li>Clean（黃色）</li>
+                    <li>Model（藍色）</li>
+                    <li>Report（紅色）</li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+</div>
+<div id="content12">
+    <h1>Power BI:欄位進行「加總、平均」時使用 ??，可能的錯誤</h1>
+    <section>
+        <h2>當您對欄位進行「加總、平均」時使用 ??，可能導致計算結果偏差，如果用法不正確。</h2>
+        <p><strong>正確用法：</strong>僅在 row-level 替換 null 為預設值後，再進行彙總</p>
+
+        <h3>為什麼會出錯？</h3>
+        <p>如果您在計算「平均值」之前，用 <code>??</code> 把 null 替換成 0，這會：</p>
+        <ul>
+            <li>讓原本應該「不計入平均」的 null 資料，變成了 0 被納入計算</li>
+            <li>結果會偏低（因為多算了 0）</li>
+        </ul>
+
+        <h3>錯誤示範</h3>
+        <p>原始資料：</p>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <tr>
+                <th>姓名</th>
+                <th>分數</th>
+            </tr>
+            <tr>
+                <td>小明</td>
+                <td>80</td>
+            </tr>
+            <tr>
+                <td>小美</td>
+                <td>null</td>
+            </tr>
+            <tr>
+                <td>小華</td>
+                <td>100</td>
+            </tr>
+        </table>
+
+        <p>如果您在新增欄位中這樣寫：</p>
+        <pre><code>Table.AddColumn(資料表, "修正分數", each [分數] ?? 0)</code></pre>
+        <p>然後再用這欄去算平均（假設用了 List.Average），會得到：</p>
+        <pre><code>(80 + 0 + 100) / 3 = 60</code></pre>
+        <p>實際上正確的應該是：</p>
+        <pre><code>(80 + 100) / 2 = 90</code></pre>
+
+        <h3>正確的方式應該是這樣：</h3>
+        <ul>
+            <li>選擇不為 null 的資料列再計算平均</li>
+            <li>或使用 List.Average 自動忽略 null 值的特性</li>
+        </ul>
+
+        <h4>正確寫法 1（使用 List.Average，自動忽略 null）</h4>
+        <pre><code>let
+    原始資料 = Table.FromRecords({
+        [姓名="小明", 分數=80],
+        [姓名="小美", 分數=null],
+        [姓名="小華", 分數=100]
+    }),
+    分數清單 = Table.Column(原始資料, "分數"),
+    平均分數 = List.Average(分數清單)
+in
+    平均分數</code></pre>
+        <p><strong>List.Average</strong> 會自動忽略 null，不需用 <code>??</code> 替換為 0</p>
+
+        <h4>正確寫法 2（先篩掉 null 再加總/平均）</h4>
+        <pre><code>let
+    分數清單 = List.RemoveNulls(Table.Column(原始資料, "分數")),
+    平均 = List.Average(分數清單)</code></pre>
+
+        <h3>結論</h3>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <tr>
+                <th>用法</th>
+                <th>結果</th>
+                <th>建議</th>
+            </tr>
+            <tr>
+                <td><code>?? 0</code> 替代 null 再加總</td>
+                <td>數字正確，但可能導致「平均偏低」</td>
+                <td>適合用在加總，不建議平均</td>
+            </tr>
+            <tr>
+                <td><code>?? 0</code> 替代 null 再平均</td>
+                <td>容易出錯</td>
+                <td>避免使用</td>
+            </tr>
+            <tr>
+                <td>不用 <code>??</code>，直接用 List.Average</td>
+                <td>最精準</td>
+                <td>推薦做法</td>
+            </tr>
+            <tr>
+                <td>先移除 null 再平均</td>
+                <td>結果準確</td>
+                <td>推薦做法</td>
+            </tr>
+        </table>
+    </section>
+
+</div>

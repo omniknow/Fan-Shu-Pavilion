@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Code Journey</title>
+  <!-- 字體：溫潤田園風格 -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <header>
+    <h1><a href="https://jeremyfan-genshin.github.io/Data-Analysis-Project/">Code Journey</a></h1>
+    <!-- <h1>Code Journey</h1> -->
+    <nav>
+      <ul>
+        <li><a href="#" onclick="loadContent('home.html', '')">首頁</a></li>
+        <li><a href="#">分類</a></li>
+        <li><a href="#">說明</a></li>        
+        <li><a href="#">團隊成員</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="breadcrumb" id="breadcrumb">
+    <span>首頁</span>
+  </div>
+
+  <div class="container">
+    <main>
+      <div class="content-area" id="content">
+        <h2>Code Journey</h2>
+        <p>請從右邊選擇一個項目來顯示內容。</p>
+      </div>
+      <!-- <article>
+        <h2>如何使用 JavaScript 操作 DOM？</h2>
+        <p>本文將介紹如何使用 JavaScript 操作網頁上的 HTML 元素，包括選取、修改內容、增加事件等基本技巧。</p>
+        <p>舉例：</p>
+        <pre><code>document.querySelector("h1").textContent = "Hello World";</code></pre>
+      </article> -->
+ 
+
+    </main>
+
+    <aside>
+      <section>
+        <h3>📌 最新文章</h3>
+        <ul>
+          <li><a href="#">資料籌備</a></li>
+          <li><a href="#">實作分享</a></li>
+          <li><a href="#">專題討論進程</a></li>
+        </ul>
+      </section>
+      <section>
+        <h3>🏷️ 標籤雲</h3>
+        <p># #前端 #CSS #教學</p>
+      </section>
+      <section>
+        <div class="index-area">
+          <div class="tree">
+            <ul>
+              <li class="parent">
+                <span class="toggle">知識拼圖</span>
+                <ul>
+                  <li><a href="#" onclick="loadContent('roadmap.html', '知識拼圖 > 實作地圖')">實作地圖</a></li>
+                  <li><a href="#" onclick="loadContent('powerbi.html', '知識拼圖 > Power BI Q&A')">Power BI Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('mysql.html', '知識拼圖 > MySQL Q&A')">MySQL Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('git.html', '知識拼圖 > Git Q&A')">Git Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('python.html', '知識拼圖 > Python Q&A')">Python Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('htmnl.html', '知識拼圖 > Html Q&A')">Html Q&A</a></li>
+                  <li><a href="#" onclick="loadContent('spyder.html', '知識拼圖 > spyder Q&A')">spyder Q&A</a></li>
+                </ul>
+              </li>
+              <li class="parent">
+                <span class="toggle">知識深化</span>
+                <ul>
+                  <li><a href="#" onclick="loadContent('books.html', '知識深化 > 推薦書籍')">推薦書籍</a></li>
+                  <li><a href="#" onclick="loadContent('content3.html', '知識深化 > 閱讀心得')">閱讀心得</a></li>
+                  <li><a href="#" onclick="loadContent('content4.html', '知識深化 > 資料工程')">資料工程</a></li>
+                </ul>
+              </li>
+              <li><a href="#" onclick="loadContent('content5.html', '單一項目')">單一項目</a></li>
+              <li class="parent">
+                <span class="toggle">分析圖表</span>
+                <ul>
+                  <li><a href="#" onclick="loadContent('plot_air_quality.html', '分析圖表 > air quality')">air quality</a></li>
+                  <li><a href="#" onclick="loadContent('plot_example.html', '分析圖表 > plot example')">plot example</a></li>
+                  <li><a href="#" onclick="loadContent('plot_bike.html', '分析圖表 > plot 百飾購選物')">plot 百飾購選物</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+  <!-- 回到 Top 的按鈕 -->
+  <button id="backToTop">Scroll Up</button>
+  <footer>
+    <p>© 2025 資料分析團隊 | <a href="#">隱私政策</a></p>
+    <p>
+      <a href="#">Facebook</a> |
+      <a href="#">Instagram</a> |
+      <a href="#">GitHub</a>
+    </p>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.tree .toggle').forEach(function (toggle) {
+      toggle.addEventListener('click', function () {
+        this.parentElement.classList.toggle('open');
+      });
+    });
+
+    function loadContent(file, breadcrumbPath = '') {
+      fetch(file)
+        .then(response => {
+          if (!response.ok) throw new Error("載入失敗");
+          return response.text();
+        })
+        .then(html => {
+          document.getElementById('content').innerHTML = html;
+          updateBreadcrumb(breadcrumbPath);
+
+          // // ✅ 新增這段：動態綁定折疊功能
+          // const toggleLink = document.querySelector('a[href="#content1"]');
+          // const targetDiv = document.getElementById("content1");
+          // if (toggleLink && targetDiv) {
+          //   toggleLink.addEventListener("click", function (e) {
+          //     e.preventDefault(); // 阻止預設跳錨點
+          //     targetDiv.style.display = (targetDiv.style.display === "none") ? "block" : "none";
+          //   });
+          // }      
+        })
+        .catch(error => {
+          document.getElementById('content').innerHTML = "<p>無法載入內容。</p>";
+          console.error(error);
+        });
+    }
+
+    function updateBreadcrumb(path) {
+      const container = document.getElementById('breadcrumb');
+      if (!path) {
+        container.innerHTML = '<span>首頁</span>';
+      } else {
+        const parts = path.split('>');
+        container.innerHTML = '<span>首頁</span> &gt; ' + parts.map((p, i) => {
+          return `<span class="${i === parts.length - 1 ? 'active' : ''}">${p.trim()}</span>`;
+        }).join(' &gt; ');
+      }
+    }
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const backToTopBtn = document.getElementById("backToTop");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 500) {
+          backToTopBtn.style.display = "block";
+        } else {
+          backToTopBtn.style.display = "none";
+        }
+      });
+
+      backToTopBtn.addEventListener("click", () => {
+        console.log("回到頂部按鈕被點擊");
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch('home.html')
+        .then(response => {
+          if (!response.ok) throw new Error('載入失敗');
+          return response.text();
+        })
+        .then(html => {
+          document.getElementById('content').innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById('content').innerHTML = `<p>載入內容發生錯誤：${err.message}</p>`;
+          console.error(err);
+        });
+    });
+  </script>
+</body>
+
+</html>

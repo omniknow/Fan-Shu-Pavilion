@@ -1,0 +1,68 @@
+<div id="summary">
+    <table>
+        <thead>
+            <tr>
+                <th>速查表</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">⭕ VS Code 中刪除檔案並使用 Git Push</a></td>
+            </tr>
+            <!-- <tr>
+                <td><a href="#content2">⭕ 批次寫入後確認「資料是否寫入成功」方法</a></td>
+            </tr> -->
+        </tbody>
+    </table>
+</div>
+<div id="content1"></div>
+    <h1>VS Code 中刪除檔案並使用 Git Push</h1>
+    <h2>VS Code 中刪除檔案並使用 Git Push</h2>
+
+    <p>在 VS Code 中使用 Git 操作時，即使你刪除了檔案，也完全可以正常 push 成功，因為 Git 是一個版本控制系統，會追蹤檔案的新增、修改、刪除。只要你正確地把「刪除這件事」加入版本控制流程中（<code>git add</code>），它就會被記錄並同步到遠端。</p>
+
+    <h3>操作流程：在 VS Code 中刪除檔案並推送到 GitHub（或其他遠端）</h3>
+
+    <div class="section">
+        <h4>1. 刪除檔案</h4>
+        <ul>
+            <li>在 VS Code 的 Explorer 中右鍵 → Delete。</li>
+            <li>或直接刪除檔案於檔案系統。</li>
+        </ul>
+
+        <h4>2. Git 變更會顯示刪除狀態</h4>
+        <ul>
+            <li>到左側的「Source Control」面板（<code>Ctrl + Shift + G</code>）。</li>
+            <li>你會看到檔案旁有個 <strong>D</strong>（deleted）標記。</li>
+        </ul>
+
+        <h4>3. 提交刪除</h4>
+        <ul>
+            <li>輸入 Commit 訊息（例如：移除不需要的檔案）。</li>
+            <li>按下核准按鈕或 <code>Ctrl + Enter</code> 來 commit。</li>
+        </ul>
+
+        <h4>4. 推送變更</h4>
+        <ul>
+            <li>點擊右下角的 Git 分支 → 選擇「Push」。</li>
+            <li>或在 Source Control 上方的「...」選單中選擇「Push」。</li>
+            <li>或使用 <code>Ctrl + Shift + P</code> → 輸入 <code>Git: Push</code>。</li>
+        </ul>
+    </div>
+
+    <h3>Git 背後實際動作（CLI 對照）</h3>
+
+    <pre><code>git rm somefile.txt        # 移除檔案
+git commit -m "刪除 somefile.txt"
+git push                   # 推送到遠端
+</code></pre>
+
+    <div class="note">
+        <strong>注意事項：</strong>
+        <ul>
+            <li>你不能只刪檔案卻不 commit，就去 push，因為 Git 不會知道你要同步這個刪除動作。</li>
+            <li>未追蹤檔案（untracked）直接刪除不會被記錄在 Git 裡。如果是這種情況，Git 根本不會管它。</li>
+        </ul>
+    </div>
+</div>
+    
