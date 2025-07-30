@@ -21,8 +21,8 @@
       <ul>
         <li><a href="#" onclick="loadContent('home.html', '')">首頁</a></li>
         <li><a href="#">分類</a></li>
-        <li><a href="#">說明</a></li>        
-        <li><a href="#">團隊成員</a></li>
+        <li><a href="#">說明</a></li>
+        <li><a href="#">關於我</a></li>
       </ul>
     </nav>
   </header>
@@ -43,7 +43,7 @@
         <p>舉例：</p>
         <pre><code>document.querySelector("h1").textContent = "Hello World";</code></pre>
       </article> -->
- 
+
 
     </main>
 
@@ -52,20 +52,16 @@
         <h3>📌 最新文章</h3>
         <ul>
           <li><a href="#">資料籌備</a></li>
-          <li><a href="#">實作分享</a></li>
+          <li><a href="#" onclick="loadContent('housing.html', '實作分享')">實作分享</a></li>
           <li><a href="#">專題討論進程</a></li>
         </ul>
-      </section>
-      <section>
-        <h3>🏷️ 標籤雲</h3>
-        <p># #前端 #CSS #教學</p>
       </section>
       <section>
         <div class="index-area">
           <div class="tree">
             <ul>
               <li class="parent">
-                <span class="toggle">知識拼圖</span>
+                <h3 class="toggle">🧩 知識拼圖</h3>
                 <ul>
                   <li><a href="#" onclick="loadContent('roadmap.html', '知識拼圖 > 實作地圖')">實作地圖</a></li>
                   <li><a href="#" onclick="loadContent('powerbi.html', '知識拼圖 > Power BI Q&A')">Power BI Q&A</a></li>
@@ -76,20 +72,23 @@
                   <li><a href="#" onclick="loadContent('spyder.html', '知識拼圖 > spyder Q&A')">spyder Q&A</a></li>
                 </ul>
               </li>
+
               <li class="parent">
-                <span class="toggle">知識深化</span>
+                <h3 class="toggle">📚 知識深化</h3>
                 <ul>
                   <li><a href="#" onclick="loadContent('books.html', '知識深化 > 推薦書籍')">推薦書籍</a></li>
                   <li><a href="#" onclick="loadContent('content3.html', '知識深化 > 閱讀心得')">閱讀心得</a></li>
                   <li><a href="#" onclick="loadContent('content4.html', '知識深化 > 資料工程')">資料工程</a></li>
                 </ul>
               </li>
-              <li><a href="#" onclick="loadContent('content5.html', '單一項目')">單一項目</a></li>
+
               <li class="parent">
-                <span class="toggle">分析圖表</span>
+                <h3 class="toggle">📈 分析圖表</h3>
                 <ul>
-                  <li><a href="#" onclick="loadContent('plot_air_quality.html', '分析圖表 > air quality')">air quality</a></li>
-                  <li><a href="#" onclick="loadContent('plot_example.html', '分析圖表 > plot example')">plot example</a></li>
+                  <li><a href="#" onclick="loadContent('plot_air_quality.html', '分析圖表 > air quality')">air quality</a>
+                  </li>
+                  <li><a href="#" onclick="loadContent('plot_example.html', '分析圖表 > plot example')">plot example</a>
+                  </li>
                   <li><a href="#" onclick="loadContent('plot_bike.html', '分析圖表 > plot 百飾購選物')">plot 百飾購選物</a></li>
                 </ul>
               </li>
@@ -97,6 +96,7 @@
           </div>
         </div>
       </section>
+
     </aside>
   </div>
   <!-- 回到 Top 的按鈕 -->

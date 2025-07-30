@@ -1,0 +1,149 @@
+<section>
+  <h1>房市分析流程架構</h1>
+
+  <!-- 大索引 -->
+  <div id="summary">
+    <h2>目錄</h2>
+    <ul>
+      <li><a href="#section1">一、資料來源</a></li>
+      <li><a href="#section2">二、資料擷取與初步清理（ETL）</a></li>
+      <li><a href="#section3">三、資料整合與加工</a></li>
+      <li><a href="#section4">四、資料轉換與儲存</a></li>
+      <li><a href="#section5">五、Power BI資料導入與維度建構</a></li>
+      <li><a href="#section6">六、Power BI分析面向建議</a></li>
+    </ul>
+  </div>
+
+  <section id="section1">
+    <h2>一、資料來源</h2>
+    <ol>
+      <li>
+        <strong>歷史交易紀錄</strong><br>
+        來源：內政部不動產交易時價登錄查詢<br>
+        範圍：台中市全區
+      </li>
+      <li>
+        <strong>即時市場交易紀錄</strong><br>
+        來源：<br>
+        永慶房仲網<br>
+        591房市交易平台<br>
+        樂屋網<br>
+        範圍：台中市太平區
+      </li>
+    </ol>
+  </section>
+
+  <section id="section2">
+    <h2>二、資料擷取與初步清理（ETL）</h2>
+    <ol>
+      <li>
+        <strong>歷史資料ETL</strong><br>
+        取得資料時，同步進行：<br>
+        日期格式正規化（例如統一為 YYYY-MM-DD）<br>
+        地址正規化（拆解、標準化行政區、路段、巷弄等欄位）<br>
+        依地址查詢經緯度，補充經緯度欄位（方便後續空間分析）
+      </li>
+      <li>
+        <strong>即時資料ETL</strong><br>
+        加入資料擷取日期欄位（用於區分資料時間點）<br>
+        加入資料來源欄位（標示該筆資料來自哪個平台）
+      </li>
+    </ol>
+  </section>
+
+  <section id="section3">
+    <h2>三、資料整合與加工</h2>
+    <ol>
+      <li>
+        <strong>合併多來源資料</strong><br>
+        將歷史與即時資料依相同欄位格式合併<br>
+        統一欄位命名與資料型態
+      </li>
+      <li>
+        <strong>重複資料處理</strong><br>
+        設計準識別碼（Key），例如：<br>
+        「地址(正規化後) + 交易日期 + 房屋坪數 + 樓層」<br>
+        使用準識別碼過濾重複筆數<br>
+        考慮模糊匹配（地址誤差容忍）以加強重複判斷準確度
+      </li>
+      <li>
+        <strong>資料品質檢核</strong><br>
+        空值補全或剔除<br>
+        欄位格式確認<br>
+        異常值偵測（例如價格過低或過高）
+      </li>
+    </ol>
+  </section>
+
+  <section id="section4">
+    <h2>四、資料轉換與儲存</h2>
+    <ol>
+      <li>
+        <strong>轉換為Parquet格式</strong><br>
+        明確指定欄位型態<br>
+        若資料量龐大，可依「年度」、「行政區」分區儲存（partition）
+      </li>
+      <li>
+        <strong>資料備份與版本管理</strong><br>
+        保留歷史資料版本，方便回溯與比較
+      </li>
+    </ol>
+  </section>
+
+  <section id="section5">
+    <h2>五、Power BI資料導入與維度建構</h2>
+    <ol>
+      <li>
+        <strong>Power Query</strong><br>
+        載入 parquet 檔案<br>
+        建立維度資料表：<br>
+        地理維度表（行政區、路段、經緯度範圍等）<br>
+        時間維度表（年月日、週次、季度、假日標記）<br>
+        交易類型維度表（租賃、買賣、建案等）<br>
+        數據清洗（如欄位格式修正、缺失值補完）
+      </li>
+      <li>
+        <strong>建立關聯模型</strong><br>
+        將交易事實表與維度表正確關聯
+      </li>
+    </ol>
+  </section>
+
+  <section id="section6">
+    <h2>六、Power BI分析面向建議</h2>
+    <ol>
+      <li>
+        <strong>時間序列分析</strong><br>
+        交易量與成交價格趨勢（週/月/年）<br>
+        價格變化與成交量關係
+      </li>
+      <li>
+        <strong>空間分析</strong><br>
+        不同行政區、鄰里成交價格與交易量分布<br>
+        地理熱區分析（高交易活躍區）<br>
+        房價熱點地圖（使用經緯度資料）
+      </li>
+      <li>
+        <strong>價格分析</strong><br>
+        坪數與價格關聯分析<br>
+        建築年代與價格趨勢<br>
+        不同建物型態（電梯大樓、公寓、透天）價格比較
+      </li>
+      <li>
+        <strong>來源比較分析</strong><br>
+        歷史資料與即時資料來源之間成交價格差異<br>
+        不同平台報價與實際成交價差異分析
+      </li>
+      <li>
+        <strong>交易行為分析</strong><br>
+        買賣時間差分析<br>
+        熱門交易月份、季節性特徵
+      </li>
+      <li>
+        <strong>預測模型應用（若有建置）</strong><br>
+        房價走勢預測<br>
+        潛在熱區預測
+      </li>
+    </ol>
+  </section>
+</section>
