@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-<!-- banner需要重新進行排版 -->
 
 <head>
   <meta charset="UTF-8" />
@@ -16,33 +15,21 @@
       box-sizing: border-box;
     }
 
-    /* ✅ 移除 body margin，讓 header/nav/footer 貼齊螢幕邊緣 */
     body {
-      margin: 0;
-      padding: 0;
       font-family: 'Merriweather', 'Noto Serif TC', serif, "Microsoft JhengHei", "Noto Sans TC", sans-serif;
       background-color: #fdfaf5;
       color: #5a4e3c;
       line-height: 1.8;
+      margin: 20px;
       background: #fefefe;
       color: #333;
     }
 
-    /* ✅ 在 container 中增加內容區域邊距 */
-    .container {
-      display: flex;
-      padding: 20px;
-      max-width: 1200px;
-      margin: auto;
-      gap: 20px;
-    }
-
     header {
-      width: 100%;
       background-image: url('banner.jpg');
       /* 橫幅背景圖 */
       background-size: cover;
-      background-position: center 10%;
+      background-position: center -650px;
       height: 300px;
       padding: 20px;
       box-shadow: 0 2px 8px rgba(120, 120, 120, 0.2);
@@ -97,6 +84,16 @@
 
     nav ul li a:hover {
       text-decoration: underline;
+    }
+
+    /* 移除 breadcrumb 相關 */
+
+    .container {
+      display: flex;
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+      gap: 20px;
     }
 
     main {
@@ -333,112 +330,114 @@
       font-weight: bold;
     }
 
-    .search-box {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 10px;
-      gap: 8px;
-    }
+.search-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  gap: 8px;
+}
 
-    .search-box input[type="text"] {
-      padding: 6px 12px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 1rem;
-      width: 200px;
-    }
+.search-box input[type="text"] {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 200px;
+}
 
-    .search-box button {
-      padding: 6px 12px;
-      font-size: 1rem;
-      background-color: #4caf50;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+.search-box button {
+  padding: 6px 12px;
+  font-size: 1rem;
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    .search-box button:hover {
-      background-color: #388e3c;
-    }
+.search-box button:hover {
+  background-color: #388e3c;
+}
 
 
-    .knowledge-explore {
-      margin-top: 2rem;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border-radius: 10px;
-    }
+.knowledge-explore {
+  margin-top: 2rem;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
 
-    .knowledge-explore h2 {
-      text-align: center;
-      color: #2e7d32;
-      margin-bottom: 1.5rem;
-    }
+.knowledge-explore h2 {
+  text-align: center;
+  color: #2e7d32;
+  margin-bottom: 1.5rem;
+}
 
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
 
-    .card {
-      background-color: #fffef9;
-      border: 1px solid #ddd;
-      border-left: 5px solid #a2c579;
-      border-radius: 8px;
-      padding: 15px 20px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s ease;
-    }
+.card {
+  background-color: #fffef9;
+  border: 1px solid #ddd;
+  border-left: 5px solid #a2c579;
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
 
-    .card:hover {
-      transform: translateY(-4px);
-    }
+.card:hover {
+  transform: translateY(-4px);
+}
 
-    .card h3 {
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
-      color: #388e3c;
-    }
+.card h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: #388e3c;
+}
 
-    .card a {
-      color: #2e7d32;
-      text-decoration: none;
-    }
+.card a {
+  color: #2e7d32;
+  text-decoration: none;
+}
 
-    .card a:hover {
-      text-decoration: underline;
-    }
+.card a:hover {
+  text-decoration: underline;
+}
 
-    .card p {
-      color: #555;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
+.card p {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
   </style>
 </head>
 
 <body>
   <header>
-    <h1><a href="https://jeremyfan-genshin.github.io/Data-Analysis-Project/">Fan-Shu-Pavilion</a></h1>
+    <h1><a href="https://jeremyfan-genshin.github.io/Data-Analysis-Project/">Code Journey</a></h1>
   </header>
 
   <nav id="mainNav">
     <ul>
-      <li><a href="https://omniknow.github.io/About-the-Pavilion-Master/">關於我</a></li>
-      <li><a href="javascript:void(0)" onclick="showTemplate('首頁')">首頁</a></li>
-      <li><a href="javascript:void(0)" onclick="showTemplate('最新文章')">最新文章</a></li>
-      <li><a href="javascript:void(0)" onclick="showTemplate('知識拼圖')">知識拼圖</a></li>
-      <li><a href="javascript:void(0)" onclick="showTemplate('知識深化')">知識深化</a></li>
-      <li><a href="javascript:void(0)" onclick="showTemplate('可視化圖表')">可視化圖表</a></li>
+      <li><a href="#" onclick="showTemplate('首頁')">首頁</a></li>
+      <li><a href="#" onclick="showTemplate('最新文章')">最新文章</a></li>
+      <li><a href="#" onclick="showTemplate('知識拼圖')">知識拼圖</a></li>
+      <li><a href="#" onclick="showTemplate('知識深化')">知識深化</a></li>
+      <li><a href="#" onclick="showTemplate('分析圖表')">分析圖表</a></li>
+      <!-- <li><a href="https://omniknow.github.io/About-the-Pavilion-Master/">關於我</a></li> -->
     </ul>
 
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜尋..." />
-      <button onclick="performSearch()">🔍</button>
-    </div>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="搜尋..." />
+  <button onclick="performSearch()">🔍</button>
+</div>
+
   </nav>
 
 
@@ -462,7 +461,6 @@
     // 吸頂導覽列自動隱藏功能
     document.addEventListener("DOMContentLoaded", () => {
       const nav = document.getElementById("mainNav");
-      const searchInput = document.getElementById("searchInput");
       let hideTimeout;
 
       const showNav = () => {
@@ -474,21 +472,15 @@
       };
 
       showNav();
-
       document.addEventListener('mousemove', showNav);
-
       let lastScrollY = window.scrollY;
+
       window.addEventListener('scroll', () => {
         if (window.scrollY !== lastScrollY) {
           showNav();
-          lastScrollY = window.scrollY;
         }
+        lastScrollY = window.scrollY;
       });
-
-      // ✅ 當搜尋框輸入文字時，也延後隱藏
-      if (searchInput) {
-        searchInput.addEventListener('input', showNav);
-      }
     });
 
     // 側邊目錄展開/收合
@@ -539,93 +531,76 @@
       loadContent('home.html');
     });
   </script>
- 
   <script>
     const templates = {
       '最新文章': `
-        <section class="knowledge-explore">
-          <h2>📌 最新文章</h2>
-          <div class="card-grid">
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('housing.html')">資料籌備</a></h3>
-              <p>初期資料來源與篩選策略。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('housing.html')">實作分享</a></h3>
-              <p>探索 housing 實際分析成果。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#">專題討論進程</a></h3>
-              <p>每週的回顧與專題討論紀錄。</p>
-            </div>
-          </div>
-        </section>
-      `,
+    <section>
+      <h3>📌 最新文章</h3>
+      <ul>
+        <li><a href="#">資料籌備</a></li>
+        <li><a href="#" onclick="loadContent('housing.html')">實作分享</a></li>
+        <li><a href="#">專題討論進程</a></li>
+      </ul>
+    </section>
+  `,
       '知識拼圖': `
-        <section class="knowledge-explore">
-          <h2>🧩 知識拼圖</h2>
-          <div class="card-grid">
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('roadmap.html')">實作地圖</a></h3>
-              <p>掌握資料科學實作的每一步。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('powerbi.html')">Power BI Q&A</a></h3>
-              <p>常見 Power BI 問題整理。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('mysql.html')">MySQL Q&A</a></h3>
-              <p>資料庫設計與查詢要點。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('git.html')">Git Q&A</a></h3>
-              <p>版本控制常見問題。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('python.html')">Python Q&A</a></h3>
-              <p>基礎與進階語法解析。</p>
-            </div>
-          </div>
-        </section>
-      `,
+    <section>
+      <div class="index-area">
+        <div class="tree">
+          <ul>
+            <li class="parent">
+              <h3 class="toggle">🧩 知識拼圖</h3>
+              <ul>
+                <li><a href="#" onclick="loadContent('roadmap.html')">實作地圖</a></li>
+                <li><a href="#" onclick="loadContent('powerbi.html')">Power BI Q&A</a></li>
+                <li><a href="#" onclick="loadContent('mysql.html')">MySQL Q&A</a></li>
+                <li><a href="#" onclick="loadContent('git.html')">Git Q&A</a></li>
+                <li><a href="#" onclick="loadContent('python.html')">Python Q&A</a></li>
+                <li><a href="#" onclick="loadContent('htmnl.html')">Html Q&A</a></li>
+                <li><a href="#" onclick="loadContent('spyder.html')">spyder Q&A</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  `,
       '知識深化': `
-        <section class="knowledge-explore">
-          <h2>📚 知識深化</h2>
-          <div class="card-grid">
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('books.html')">推薦書籍</a></h3>
-              <p>數據、工程、AI 等主題的優質書單。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('content3.html')">閱讀心得</a></h3>
-              <p>每本書的閱讀重點與個人反思。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('knowledgeCompass.html')">知識探索</a></h3>
-              <p>探索跨領域知識圖譜。</p>
-            </div>
-          </div>
-        </section>
-      `,
-      '可視化圖表': `
-        <section class="knowledge-explore">
-          <h2>📈 可視化圖表</h2>
-          <div class="card-grid">
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('plot_air_quality.html')">Air Quality</a></h3>
-              <p>空氣品質可視化圖表範例。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('plot_example.html')">Plot Example</a></h3>
-              <p>不同資料的圖表展示方式。</p>
-            </div>
-            <div class="card">
-              <h3><a href="#" onclick="loadContent('plot_bike.html')">百飾購選物</a></h3>
-              <p>購物行為的視覺化呈現。</p>
-            </div>
-          </div>
-        </section>
-      `
+    <section>
+      <div class="index-area">
+        <div class="tree">
+          <ul>
+            <li class="parent">
+              <h3 class="toggle">📚 知識深化</h3>
+              <ul>
+                <li><a href="#" onclick="loadContent('books.html')">推薦書籍</a></li>
+                <li><a href="#" onclick="loadContent('content3.html')">閱讀心得</a></li>
+                <li><a href="#" onclick="loadContent('knowledgeCompass.html')">知識探索</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  `,
+      '分析圖表': `
+    <section>
+      <div class="index-area">
+        <div class="tree">
+          <ul>
+            <li class="parent">
+              <h3 class="toggle">📈 分析圖表</h3>
+              <ul>
+                <li><a href="#" onclick="loadContent('plot_air_quality.html')">air quality</a></li>
+                <li><a href="#" onclick="loadContent('plot_example.html')">plot example</a></li>
+                <li><a href="#" onclick="loadContent('plot_bike.html')">plot 百飾購選物</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  `
     };
 
     function showTemplate(key) {
@@ -638,19 +613,23 @@
           .catch(() => contentArea.innerHTML = "<p>無法載入首頁內容。</p>");
       } else if (templates[key]) {
         contentArea.innerHTML = templates[key];
+        // 開啟 toggle 樹狀結構
+        document.querySelectorAll('.tree .toggle').forEach(function (toggle) {
+          toggle.addEventListener('click', function () {
+            this.parentElement.classList.toggle('open');
+          });
+        });
       } else {
         contentArea.innerHTML = "<p>暫無內容。</p>";
       }
     }
 
-    function loadContent(fileName) {
-      fetch(fileName)
-        .then(res => res.text())
-        .then(html => document.getElementById('content').innerHTML = html)
-        .catch(() => document.getElementById('content').innerHTML = "<p>無法載入內容。</p>");
+    function loadContent(file) {
+      fetch(file).then(r => r.text()).then(html => {
+        document.getElementById('content').innerHTML = html;
+      }).catch(() => { document.getElementById('content').innerHTML = '<p>載入失敗</p>'; });
     }
-  </script>
-  <script>
+
     const searchFiles = [
       'home.html',
       'roadmap.html',
@@ -705,8 +684,8 @@
       } else {
         container.innerHTML = '<p>❌ 找不到符合的項目</p>';
       }
-    }    
-  </script>
+    }
+    </script>
 </body>
 
 </html>
