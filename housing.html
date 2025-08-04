@@ -1,3 +1,651 @@
+  <div id="summary">
+<div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;">
+  <iframe title="bike"
+    src="https://app.powerbi.com/reportEmbed?reportId=414ae9f5-632e-4b6f-ae71-a79aeae9fdf2&autoAuth=true&ctid=38c234ae-7725-479d-81a1-9b6d2fa56530"
+    frameborder="0" allowFullScreen="true" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+  </iframe>
+</div>    
+<!-- <iframe title="house-taiping" width="1140" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=414ae9f5-632e-4b6f-ae71-a79aeae9fdf2&autoAuth=true&ctid=38c234ae-7725-479d-81a1-9b6d2fa56530" frameborder="0" allowFullScreen="true"></iframe>     -->
+    <table>
+        <thead>
+            <tr>
+                <th>大台中房市分析－太平篇－內容索引<a href="https://app.powerbi.com/reportEmbed?reportId=414ae9f5-632e-4b6f-ae71-a79aeae9fdf2&autoAuth=true&ctid=38c234ae-7725-479d-81a1-9b6d2fa56530" target="_blank">點我看圖表</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="#content1">一、研究動機</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content2">二、資料取得與處理流程-ETL</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content3">三、初步成果與分析期待</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content4">四、台中市不動產成交趨勢</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content5">五、行政區交易探討-屋齡</a></td>
+            </tr>
+            <tr>
+                <td><a href="#content6">六、太平區在售物件分析</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+  
+  
+  
+  <section>
+    <h1>大台中房市分析－太平篇</h1>
+    <h2 id="content1">一、研究動機</h2>
+    <p>我住在太平，想買房，但對房市並不熟悉，心中充滿許多疑惑：</p>
+    <ul>
+      <li>現在的房價是否昂貴？</li>
+      <li>總價是否合理？</li>
+      <li>哪些區域的房屋類型較多？</li>
+      <li>現在有很多新房子可以選嗎？會不會都是老房子呢？</li>
+      <li>房仲網的價錢是不是行情價？還有議價空間嗎？</li>
+    </ul>
+    <p>如果有人能幫我解答這些問題，那就太好了！</p>
+  </section>
+
+  <section>
+    <h2 id="content2">二、資料取得與處理流程-ETL</h2>
+    <blockquote>老師有說過:「政府提供許多公開資料，直接搜尋下載就好；沒有的，只要資料在網頁上出現，就用爬蟲技巧自己抓，沒什麼大問題。」</blockquote>
+    <p>於是我決定，這次就把老師傳授的 <strong>ETL 整個流程</strong> 重新演繹一遍，像偵探辦案一樣，一步步把太平房市的資料拼湊完整。</p>
+
+    <h3>1. Extract（提取）－蒐集線索</h3>
+    <ul>
+      <li>資料庫（MySQL、PostgreSQL、Oracle）</li>
+      <li>API</li>
+      <li>CSV、Excel、JSON 等檔案</li>
+      <li>雲端儲存（AWS S3、Google Cloud Storage）</li>
+      <li>日誌系統或感測器資料</li>
+    </ul>
+    <p><strong>我的實際操作：</strong></p>
+    <ul>
+      <li>從 <strong>不動產交易平台</strong> 下載台中市實價登錄 CSV</li>
+      <li>從 <strong>內政部不動產交易時價查詢服務網</strong> 下載 102Q1 至 114Q2 的歷史交易紀錄，超過 50 個檔案</li>
+      <li>在快速瀏覽欄位內容後，進行檔案合併</li>
+    </ul>
+
+    <h3>2. Transform（轉換）－整理拼圖</h3>
+    <p>收集到的原始資料，還無法直接用來分析，就像一箱雜亂的拼圖，需要先分類、清洗，再拼出全貌。</p>
+    <ul>
+      <li>資料型別轉換（數字、日期、布林值）</li>
+      <li>去除重複、補齊缺值</li>
+      <li>格式標準化（例如地址、電話號碼）</li>
+      <li>建立衍生欄位（例如：總價 ÷ 坪數 = 每坪單價）</li>
+    </ul>
+    <p><strong>我的實際操作：</strong></p>
+    <ul>
+      <li>把「成交年月日」改成 YYYY-MM-DD 格式</li>
+      <li>計算每坪價格</li>
+      <li>地址標準化（用程式處理，有些麻煩，但都已克服，主要是為了查詢經緯度）</li>
+      <li>撰寫爬蟲模擬翻頁，抓取在售物件資料(永慶房仲網)</li>
+    </ul>
+
+    <h3>3. Load（載入）－資料進倉</h3>
+    <p>整理好的資料，就像拼好的拼圖，現在可以放進資料倉庫或分析工具，開始進行探索與視覺化。</p>
+    <ul>
+      <li>資料倉儲（BigQuery、Snowflake、Redshift）</li>
+      <li>BI 工具（Power BI、Tableau）</li>
+      <li>傳統資料庫（PostgreSQL、SQL Server）</li>
+    </ul>
+    <p><strong>我的實際操作：</strong></p>
+    <ul>
+      <li>將整理好的資料載入 Power BI</li>
+      <li>依分析目的建立資料行、維度表，並設定關聯</li>
+      <li>這裡有較多的表格建立操作，在售物件與歷史資料不合併處理，主要是為了避免資料混淆。</li>
+      <li>為了關聯這兩的資料表，因此需要建立以下維度資料表，以進行關聯：
+        <ul>
+          <li>行政區(鄉鎮市區)</li>
+          <li>屋齡區間</li>
+          <li>建物型態</li>
+          <li>房價區間</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 id="content3">三、初步成果與分析期待</h2>
+    <p>我已取得了歷史資料，以及在售資料，這些資料似乎已足以解除我大部分的疑惑：</p>
+    <ul>
+      <li>我能夠比對歷史價格與目前市場價格</li>
+      <li>知道哪些區域的房型、屋齡分布</li>
+      <li>確認房仲網價是否貼近市場行情</li>
+    </ul>
+    <p>接下來，我將利用這些資料在 <strong>Power BI</strong> 中進行分析與視覺化，並透過圖表回答我最初對太平房市的所有問題。</p>
+  </section>
+
+  <section>
+    <h2 id="content4">四、台中市不動產成交趨勢</h2>
+    <img src="/images/p1.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">
+    <h3>1️⃣ 年成交量－建物</h3>
+    <img src="/images/p1-1.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">    
+    <ul>
+      <li>2020 年達高峰，成交件數最高，主要受疫情、低利率影響</li>
+      <li>透天厝與住宅大樓是主要成交類型</li>
+      <li>低利率 + 錢潮寬鬆 + 投資避險需求 推升購屋熱潮</li>
+      <li>2021–2022：房市過熱，政府推出「打炒房」措施（信用管制、禁止換約、房地合一2.0等）</li>
+      <li>2023 起利率上升，買氣趨緩</li>
+    </ul>
+
+    <h3>2️⃣ 年成交量－行政區</h3>
+    <img src="/images/p1-2.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <p>北屯區與太平區成交最熱絡，2020 年達巔峰；其他行政區交易平穩</p>
+
+    <h3>3️⃣ 成交建物型態占比</h3>
+    <img src="/images/p1-3.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <p>住宅大樓約占 67%，透天厝 19%，華廈 14%</p>
+
+    <h3>4️⃣ 年度平均單價趨勢－建物</h3>
+    <img src="/images/p1-4.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <p>單價持續上升，透天厝最高，其次為住宅大樓；華廈價格最低，但漲幅明顯</p>
+
+    <h3>5️⃣ 年度平均單價趨勢－行政區</h3>
+    <img src="/images/p1-5.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <p>北屯價格最高，太平價格較親民但漲勢穩健</p>
+
+    <h3>6️⃣ 成交數統計</h3>
+    <img src="/images/p1-6.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <p>北屯成交最多，太平次之；住宅大樓為主力產品</p>
+
+    <p><strong>洞察總結：</strong> 太平區屬於「成交活躍但價格較親民」的區域，是我心中的買房首選。</p>
+  </section>
+
+  <section>
+    <h2 id="content5">五、行政區交易探討-屋齡</h2>
+    <img src="/images/p2.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">    
+    <h3>1️⃣ 年交易量－屋齡</h3>
+    <img src="/images/p2-1.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <ul>
+      <li>0-5 年新屋交易量最高，2020 年最為突出</li>
+      <li>10 年以上老屋交易明顯偏低</li>
+      <li>近兩年新屋交易減少，市場趨向理性</li>
+    </ul>
+
+    <h3>2️⃣ 行政區熱門物件－屋齡</h3>
+    <img src="/images/p2-2.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <p>北屯新屋最熱，太平次之；市中心各區交易量明顯偏低</p>
+
+    <h3>3️⃣ 年度統計洞察</h3>
+    <img src="/images/p2-3.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">        
+    <p>到2025 年新屋仍為主力，老屋佔比不到三成</p>
+
+    <p><strong>洞察總結：</strong> 台中房市以「新屋」為主，北屯與太平最活躍</p>
+  </section>
+
+  <section>
+    <h2 id="content6">六、太平區在售物件分析</h2>
+    <img src="/images/p3.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">    
+    <h3>1️⃣ 在售建物型態比例</h3>
+    <img src="/images/p3-1.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">      
+    <p>住宅大樓占比約 44%，透天厝約 37%，華廈與公寓合計不到 20%</p>
+
+    <h3>2️⃣ 平均單價－建物</h3>
+    <img src="/images/p3-2.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">  
+    <ul>
+      <li>透天厝約 0.47 百萬/坪</li>
+      <li>住宅大樓約 0.35 百萬/坪</li>
+      <li>華廈與公寓約 0.27 百萬/坪</li>
+    </ul>
+
+    <h3>3️⃣ 依建坪看物件數</h3>
+    <img src="/images/p3-3.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">  
+    <p>36-50 坪與 51-70 坪產品最多，占比超過 60%</p>
+
+    <h3>4️⃣ 在售平均單價與歷年比較</h3>
+    <img src="/images/p3-4.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">  
+    <p>在售價格高於歷年成交價，顯示有溢價空間；透天厝漲幅最明顯</p>
+
+    <h3>5️⃣ 依總價看物件數</h3>
+    <img src="/images/p3-5.png" alt="" style="max-width: 100%; height: auto; transition: transform 0.3s ease; cursor: zoom-in;" 
+         onclick="toggleZoom()">  
+    <ul>
+      <li>1000-2000 萬物件最多</li>
+      <li>2000 萬以上多為高總價透天</li>
+      <li>500 萬以下物件幾乎絕跡</li>
+    </ul>
+
+    <p><strong>洞察總結：</strong> 太平區在售市場以中大型住宅大樓與透天為主，房仲開價略高，有議價空間，幫助我進一步鎖定理想房型與價格帶。</p>
+  </section>
+
+
+
+
+
+
+
+
+房市分析流程架構
+目錄
+一、資料來源
+
+二、資料擷取與初步清理（ETL）
+
+三、資料整合與加工
+
+四、資料轉換與儲存
+
+五、Power BI資料導入與維度建構
+
+六、Power BI分析面向建議
+
+一、資料來源
+    歷史交易紀錄
+        來源：內政部不動產交易時價登錄查詢
+        範圍：台中市全區
+    取得方式：直接下載csv檔
+
+    即時線上房價
+    來源：
+        永慶房仲網
+        591房市交易平台
+        樂屋網
+    範圍：台中市太平區
+    資料取得方式：
+        使用Web Scraping爬取資料。
+
+        
+以下以爬取永慶房屋資訊為例做簡要的說明:
+
+網站：永慶房屋（https://www.yungching.com.tw/）
+實際要爬取的網站：（https://buy.yungching.com.tw/）
+
+目的：擷取台中市太平區的房屋售價、坪數、地址等資訊
+
+注意事項:永慶網頁使用 JavaScript 動態渲染，無法直接以request方式爬取整個網頁進行分析，而是要用 Selenium 模擬瀏覽器才能抓取資料。
+
+工具與套件需求:
+pip install selenium pandas pyarrow
+
+另外需要下載 ChromeDriver，並放到環境變數或指定路徑。
+
+完整python ETL的程序部分如下:
+
+<pre>
+   options = webdriver.ChromeOptions()          #建立一個 ChromeOptions 物件，用來設定啟動 Chrome 瀏覽器時的啟動選項（例如是否隱藏視窗、關閉日誌輸出等）。
+
+   # options.add_argument("--headless")         # 可啟用無頭模式
+                                                #👉 這一行被註解掉了。
+                                                #若取消註解，會啟用 headless mode（無頭模式），瀏覽器會在背景執行、不顯示 GUI。適合自動化與伺服器環境使用。
+
+    options.add_argument("--log-level=3")       #降低 Chrome Driver 的日誌輸出等級，3 表示只顯示 錯誤訊息（ERROR），讓終端機更乾淨。
+                                                  等級對應如下：
+                                                  0 = ALL
+                                                  1 = INFO
+                                                  2 = WARNING
+                                                  3 = ERROR
+
+    driver = webdriver.Chrome(options=options)  #(建立一個 Chrome 瀏覽器的 WebDriver 實例，並將剛才設定的 options 套用進去。
+                                                  這 driver 是 Selenium 操作瀏覽器的主要控制物件。)
+
+    select_city_and_district(driver)            # 用來打開永慶房屋網站、選擇 台中市太平區，並觸發搜尋
+
+    filename = "yungching_houses.csv"           # 指定爬下來的資料要存成哪個檔案。這裡設定為 yungching_houses.csv。
+    crawl_all_pages(driver, filename)           # 從搜尋結果的第一頁開始往後翻頁，持續抓取房屋資料並寫入 CSV 檔，直到：
+                                                   沒有下一頁按鈕，或到達最大頁數（預設為 200 頁）
+
+    print(f"資料已儲存至 {filename}")
+    driver.quit()                               # 結束 Selenium 工作流程，關閉瀏覽器與資源清理。
+</pre>
+
+從 Selenium 4.6 開始，它整合了 Selenium Manager：
+
+    Selenium Manager 會自動幫你下載與管理對應版本的 chromedriver，所以你不需要自己設定路徑。
+    向下面這樣操作，就可以正常啟動chrome了
+    <pre>
+    from selenium import webdriver
+
+    options = webdriver.ChromeOptions()
+    driver = webdriver.Chrome(options=options)  # ✅ 自動處理 chromedriver
+    </pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>
+import csv
+import os
+import time
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
+
+
+def select_city_and_district(driver):
+    wait = WebDriverWait(driver, 10)
+    driver.get("https://buy.yungching.com.tw/")
+
+    area_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div.area")))
+    area_btn.click()
+    time.sleep(1)
+
+    city_btns = wait.until(EC.presence_of_all_elements_located(
+        (By.CSS_SELECTOR, "div.menuSelect > div.menuBtn")
+    ))
+
+    for city_btn in city_btns:
+        if "台中市" in city_btn.text:
+            driver.execute_script("arguments[0].click();", city_btn)
+            break
+    time.sleep(1)
+
+    district_btns = driver.find_elements(By.CSS_SELECTOR, "span.itemBtn")
+    for d_btn in district_btns:
+        if "太平區" in d_btn.text:
+            driver.execute_script("arguments[0].click();", d_btn)
+            break
+    time.sleep(1)
+
+    search_btn = driver.find_element(By.CSS_SELECTOR, "div.search-btn")
+    driver.execute_script("arguments[0].click();", search_btn)
+    time.sleep(3)
+
+
+def parse_items(driver):
+    results = []
+    wait = WebDriverWait(driver, 10)
+
+    try:
+        items = wait.until(EC.presence_of_all_elements_located(
+            (By.CSS_SELECTOR, "li.buy-item")
+        ))
+    except TimeoutException:
+        return results
+
+    for idx in range(len(items)):
+        for retry in range(3):
+            try:
+                item = driver.find_element(
+                    By.XPATH, f"(//li[contains(@class, 'buy-item')])[{idx + 1}]"
+                )
+
+                title = item.find_element(By.CSS_SELECTOR, '.caseName').text.strip() if item.find_elements(By.CSS_SELECTOR, '.caseName') else ""
+                address = item.find_element(By.CSS_SELECTOR, '.address').text.strip() if item.find_elements(By.CSS_SELECTOR, '.address') else ""
+                community = item.find_element(By.CSS_SELECTOR, '.community').text.strip() if item.find_elements(By.CSS_SELECTOR, '.community') else ""
+                house_type = item.find_element(By.CSS_SELECTOR, '.caseType').text.strip() if item.find_elements(By.CSS_SELECTOR, '.caseType') else ""
+
+                spans = item.find_elements(By.CSS_SELECTOR, 'span')
+                age = spans[1].text.strip() if len(spans) > 1 else ""
+
+                reg_area = item.find_element(By.CSS_SELECTOR, '.regArea').text.strip() if item.find_elements(By.CSS_SELECTOR, '.regArea') else ""
+                main_area = item.find_element(By.CSS_SELECTOR, '.mainArea').text.strip() if item.find_elements(By.CSS_SELECTOR, '.mainArea') else ""
+                floor = item.find_element(By.CSS_SELECTOR, '.floor').text.strip() if item.find_elements(By.CSS_SELECTOR, '.floor') else ""
+                room = item.find_element(By.CSS_SELECTOR, '.room').text.strip() if item.find_elements(By.CSS_SELECTOR, '.room') else ""
+                car = item.find_element(By.CSS_SELECTOR, '.car').text.strip() if item.find_elements(By.CSS_SELECTOR, '.car') else ""
+
+                origin_price = item.find_element(By.CSS_SELECTOR, '.origin-price').text.strip() if item.find_elements(By.CSS_SELECTOR, '.origin-price') else ""
+                discount = item.find_element(By.CSS_SELECTOR, '.discount').text.strip() if item.find_elements(By.CSS_SELECTOR, '.discount') else ""
+                price = item.find_element(By.CSS_SELECTOR, '.price').text.strip() if item.find_elements(By.CSS_SELECTOR, '.price') else ""
+
+                link_el = item.find_element(By.CSS_SELECTOR, 'a.link') if item.find_elements(By.CSS_SELECTOR, 'a.link') else None
+                link = f"https://buy.yungching.com.tw/{link_el.get_attribute('href')}" if link_el else ""
+
+                results.append({
+                    "標題": title,
+                    "地址": address,
+                    "社區": community,
+                    "類型": house_type,
+                    "屋齡": age,
+                    "建坪": reg_area,
+                    "主+陽": main_area,
+                    "樓層": floor,
+                    "格局": room,
+                    "車位": car,
+                    "原價": origin_price,
+                    "折扣": discount,
+                    "售價": price,
+                    "連結": link,
+                    "資料來源": "永慶房仲網",
+                    "爬取時間": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                })
+
+                break  # 成功後跳出 retry 迴圈
+
+            except StaleElementReferenceException:
+                print(f"元素失效，重試第 {retry + 1} 次")
+                time.sleep(1)
+
+            except Exception as e:
+                print(f"其他錯誤：{e}")
+                break  # 非元素失效錯誤就不重試
+
+    return results
+
+
+def write_to_csv(filename, data, is_first_page):
+    file_exists = os.path.isfile(filename)
+
+    with open(filename, mode='a', newline='', encoding='utf-8-sig') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=data[0].keys())
+
+        if is_first_page and not file_exists:
+            writer.writeheader()
+
+        writer.writerows(data)
+
+
+def crawl_all_pages(driver, filename):
+    wait = WebDriverWait(driver, 15)
+    page_num = 1
+    max_page = 200
+
+    while page_num <= max_page:
+        print(f"爬取第 {page_num} 頁")
+
+        try:
+            wait.until(EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "li.buy-item")
+            ))
+        except TimeoutException:
+            print("等待列表元素超時，跳出")
+            break
+
+        data = parse_items(driver)
+
+        if data:
+            write_to_csv(filename, data, is_first_page=(page_num == 1))
+
+        try:
+            pagination = wait.until(EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "yc-ng-pagination div.pagination")
+            ))
+            next_btn = pagination.find_element(By.CSS_SELECTOR, "div.paginationNext")
+            classes = next_btn.get_attribute("class")
+
+            if "disabled" in classes:
+                print("下一頁按鈕已禁用，結束爬取。")
+                break
+            else:
+                next_btn.click()
+                page_num += 1
+                time.sleep(2)
+
+        except (NoSuchElementException, TimeoutException):
+            print("找不到下一頁按鈕或載入超時，結束爬取。")
+            break
+
+
+def main():
+    options = webdriver.ChromeOptions()
+    # options.add_argument("--headless")  # 可啟用無頭模式
+    options.add_argument("--log-level=3")
+
+    driver = webdriver.Chrome(options=options)
+
+    select_city_and_district(driver)
+
+    filename = "yungching_houses.csv"
+    crawl_all_pages(driver, filename)
+
+    print(f"資料已儲存至 {filename}")
+    driver.quit()
+
+
+if __name__ == "__main__":
+    main()
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+二、資料擷取與初步清理（ETL）
+歷史資料ETL
+取得資料時，同步進行：
+
+日期格式正規化（例如統一為 YYYY-MM-DD）
+
+地址正規化（拆解、標準化行政區、路段、巷弄等欄位）
+
+依地址查詢經緯度，補充經緯度欄位（方便後續空間分析）
+
+即時資料ETL
+
+加入資料擷取日期欄位（用於區分資料時間點）
+
+加入資料來源欄位（標示該筆資料來自哪個平台）
+
+三、資料整合與加工
+合併多來源資料
+
+將歷史與即時資料依相同欄位格式合併
+
+統一欄位命名與資料型態
+
+重複資料處理
+
+設計準識別碼（Key），例如：
+「地址(正規化後) + 交易日期 + 房屋坪數 + 樓層」
+
+使用準識別碼過濾重複筆數
+
+考慮模糊匹配（地址誤差容忍）以加強重複判斷準確度
+
+資料品質檢核
+
+空值補全或剔除
+
+欄位格式確認
+
+異常值偵測（例如價格過低或過高）
+
+四、資料轉換與儲存
+轉換為Parquet格式
+
+明確指定欄位型態
+
+若資料量龐大，可依「年度」、「行政區」分區儲存（partition）
+
+資料備份與版本管理
+
+保留歷史資料版本，方便回溯與比較
+
+五、Power BI資料導入與維度建構
+Power Query
+
+載入 parquet 檔案
+
+建立維度資料表：
+
+地理維度表（行政區、路段、經緯度範圍等）
+
+時間維度表（年月日、週次、季度、假日標記）
+
+交易類型維度表（租賃、買賣、建案等）
+
+數據清洗（如欄位格式修正、缺失值補完）
+
+建立關聯模型
+
+將交易事實表與維度表正確關聯
+
+六、Power BI分析面向建議
+時間序列分析
+
+交易量與成交價格趨勢（週/月/年）
+
+價格變化與成交量關係
+
+空間分析
+
+不同行政區、鄰里成交價格與交易量分布
+
+地理熱區分析（高交易活躍區）
+
+房價熱點地圖（使用經緯度資料）
+
+價格分析
+
+坪數與價格關聯分析
+
+建築年代與價格趨勢
+
+不同建物型態（電梯大樓、公寓、透天）價格比較
+
+來源比較分析
+
+歷史資料與即時資料來源之間成交價格差異
+
+不同平台報價與實際成交價差異分析
+
+交易行為分析
+
+買賣時間差分析
+
+熱門交易月份、季節性特徵
+
+預測模型應用（若有建置）
+
+房價走勢預測
+
+潛在熱區預測
+
+
+
+
+
 <section>
   <h1>房市分析流程架構</h1>
 
