@@ -38,8 +38,9 @@
     }
 
     header {
+      position: relative; /* ⬅️ 關鍵！讓裡面絕對定位元素以它為基準 */
       width: 100%;
-      background-image: url('banner.jpg');
+      background-image: url('./images/banner.jpg');
       /* 橫幅背景圖 */
       background-size: cover;
       background-position: center 10%;
@@ -418,12 +419,100 @@
       line-height: 1.6;
     }
   </style>
+  <style>
+    header .fade {
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+
+    header .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    header .content-wrapper {
+      position: absolute;
+      bottom: 20px;
+      text-align: center;
+    }
+
+    header .banner-image {
+      max-width: 200px;
+      border-radius: 8px;
+      transition: opacity 1s ease;
+
+    }
+
+    header a {
+      color: white;
+      font-size: 24px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    header img {
+      height: auto;
+      /* 或 width 根據實際需求 */
+      width: 25%;
+      max-width: 200px;
+      border-radius: 50%;
+      margin-left: 15px;
+    }
+#bannerTitle {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 3;
+  transition: opacity 1s ease;
+}
+#bannerImage {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+  transition: opacity 1s ease;
+}
+
+  </style>
 </head>
 
 <body>
+  <!-- <header>
+    <h1><a href="#">Fan-Shu-Pavilion</a></h1>
+  </header> -->
+
   <header>
-    <h1><a href="https://jeremyfan-genshin.github.io/Data-Analysis-Project/">Fan-Shu-Pavilion</a></h1>
+    <a id="bannerTitle" class="fade" onclick="toggleBanner()">Fan-Shu-Pavilion</a>
+    <img id="bannerImage" src="./images/fan-shu-pavilion-qrcode.png" class="banner-image hidden" />
   </header>
+
+  <script>
+    const title = document.getElementById('bannerTitle');
+    const image = document.getElementById('bannerImage');
+
+    function toggleBanner() {
+      // 1. 淡出標題
+      title.classList.add('hidden');
+
+      // 2. 換成圖片，等 1 秒後淡入圖片
+      setTimeout(() => {
+        image.classList.remove('hidden');
+      }, 1000);
+
+      // 3. 5 秒後，淡出圖片
+      setTimeout(() => {
+        image.classList.add('hidden');
+      }, 6000); // 1s 淡入 + 5s 顯示 = 6s
+
+      // 4. 圖片淡出後，回到標題（再等 1 秒）
+      setTimeout(() => {
+        title.classList.remove('hidden');
+      }, 7000);
+    }
+  </script>
+
+
+
 
   <nav id="mainNav">
     <ul>
@@ -539,7 +628,7 @@
       loadContent('home.html');
     });
   </script>
- 
+
   <script>
     const templates = {
       '我的專題': `
